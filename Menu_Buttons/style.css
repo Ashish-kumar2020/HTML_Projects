@@ -1,0 +1,55 @@
+.menu{
+    margin: 1rem;
+    padding: 4px;
+}
+
+.dot{
+    width: 1rem;
+    height: 1rem;
+    /* border: 1px solid; */
+    margin-bottom: 4px;
+    background-color: #424242;
+    border-radius: 50%;
+}
+
+.square{
+     width: 1rem;
+     height: 1rem;
+    /* border: 1px solid; */
+    margin-bottom: 4px;
+    background-color: #424242;
+   
+}
+
+.rect{
+     width: 2.5rem;
+     height: .5rem;
+    /* border: 1px solid; */
+    margin-bottom: 4px;
+    background-color: #424242;
+ 
+}
+
+.dot:hover, 
+.square:hover, 
+.rect:hover{
+    background-color: rgba(68, 240, 76, 0.4);
+     cursor:pointer
+}
+
+/* .menu:hover > div{
+     background-color: rgba(68, 240, 76, 0.4);
+     cursor:pointer
+} */
+
+.dot:last-child{
+    margin-bottom: 0px;
+}
+
+.square:last-child{
+    margin-bottom: 0px;
+}
+
+.rect:last-child{
+    margin-bottom: 0px;
+}
