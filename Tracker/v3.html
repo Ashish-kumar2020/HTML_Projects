@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Search & Preparation Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.454.0/dist/umd/lucide.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    td, th { white-space: nowrap; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="bg-gradient-to-tr from-indigo-500 to-purple-500 p-2 rounded-xl text-white">
+          <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-none text-white">Prep Command Center</h1>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="exportData()" title="Download your data as a JSON file" class="hidden sm:flex bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs px-3 py-2 rounded-xl items-center gap-1.5 transition-all">
+          <i data-lucide="download" class="w-4 h-4"></i> Export
+        </button>
+        <button onclick="document.getElementById('importFile').click()" title="Load a previously exported JSON file" class="hidden sm:flex bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs px-3 py-2 rounded-xl items-center gap-1.5 transition-all">
+          <i data-lucide="upload" class="w-4 h-4"></i> Import
+        </button>
+        <input type="file" id="importFile" accept="application/json" class="hidden" onchange="importData(event)">
+        <button onclick="openModal()" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium text-xs px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5 transition-all">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Entry
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 overflow-x-auto no-scrollbar border-t border-slate-800/60 pt-1">
+      <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active px-4 py-2.5 text-sm font-medium border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Overview</button>
+      <button onclick="switchTab('dsa')" id="tab-dsa" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="code-2" class="w-4 h-4"></i> DSA</button>
+      <button onclick="switchTab('crio')" id="tab-crio" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="graduation-cap" class="w-4 h-4"></i> Crio Course</button>
+      <button onclick="switchTab('js')" id="tab-js" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="file-json" class="w-4 h-4"></i> JS</button>
+      <button onclick="switchTab('react')" id="tab-react" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="atom" class="w-4 h-4"></i> React</button>
+      <button onclick="switchTab('gym')" id="tab-gym" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="dumbbell" class="w-4 h-4"></i> Gym</button>
+      <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="folder-git-2" class="w-4 h-4"></i> Projects</button>
+      <button onclick="switchTab('mc')" id="tab-mc" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="cpu" class="w-4 h-4"></i> Machine Coding</button>
+      <button onclick="switchTab('interviews')" id="tab-interviews" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="briefcase" class="w-4 h-4"></i> Interviews</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
+
+    <!-- OVERVIEW TAB -->
+    <div id="view-overview" class="tab-content space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">DSA Solved</p>
+          <p id="stat-dsa" class="text-2xl font-bold text-emerald-400 mt-1">- / -</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">JavaScript Topics</p>
+          <p id="stat-js" class="text-2xl font-bold text-amber-400 mt-1">- / -</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">React Topics</p>
+          <p id="stat-react" class="text-2xl font-bold text-cyan-400 mt-1">- / -</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Projects Completed</p>
+          <p id="stat-projects" class="text-2xl font-bold text-purple-400 mt-1">- / -</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Gym Sessions (7d)</p>
+          <p id="stat-gym" class="text-2xl font-bold text-lime-400 mt-1">-</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Machine Coding</p>
+          <p id="stat-mc" class="text-2xl font-bold text-pink-400 mt-1">- / -</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Applications Sent</p>
+          <p id="stat-apps" class="text-2xl font-bold text-indigo-400 mt-1">-</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Offers</p>
+          <p id="stat-offers" class="text-2xl font-bold text-yellow-400 mt-1">-</p>
+        </div>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl">
+        <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="pie-chart" class="w-5 h-5 text-indigo-400"></i> Track Area Completion Breakdown</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+              <tr><th class="p-3">Track Area</th><th class="p-3">Done</th><th class="p-3">Total / Target</th><th class="p-3">% Complete</th><th class="p-3">Status / Notes</th></tr>
+            </thead>
+            <tbody id="overview-tbody" class="divide-y divide-slate-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Prep Time Allocation -->
+        <div class="glass-card p-6 rounded-2xl">
+          <h2 class="text-base font-bold text-white mb-1 flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5 text-indigo-400"></i> Prep Time Allocation</h2>
+          <p class="text-xs text-slate-500 mb-4">Click a target value to edit it.</p>
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+              <tr><th class="p-2.5">Area</th><th class="p-2.5">Target</th></tr>
+            </thead>
+            <tbody id="timealloc-tbody" class="divide-y divide-slate-800/60"></tbody>
+          </table>
+        </div>
+
+        <!-- Application Pipeline Funnel -->
+        <div class="glass-card p-6 rounded-2xl">
+          <h2 class="text-base font-bold text-white mb-1 flex items-center gap-2"><i data-lucide="filter" class="w-5 h-5 text-indigo-400"></i> Application Pipeline Funnel</h2>
+          <p class="text-xs text-slate-500 mb-4">Computed live from the Interviews tab.</p>
+          <div id="funnel-container" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- Weekly DSA Momentum -->
+      <div class="glass-card p-6 rounded-2xl">
+        <h2 class="text-base font-bold text-white mb-1 flex items-center gap-2"><i data-lucide="trending-up" class="w-5 h-5 text-emerald-400"></i> Weekly DSA Momentum</h2>
+        <p class="text-xs text-slate-500 mb-4">Problems marked Done in the DSA Problem Log, grouped by week (last 8 weeks).</p>
+        <div class="h-64"><canvas id="momentumChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- DSA TAB -->
+    <div id="view-dsa" class="tab-content hidden space-y-6">
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-xl font-bold text-emerald-400">DSA Topic Progress</h2>
+          <button onclick="openModal('DSATopics')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Topic
+          </button>
+        </div>
+        <p class="text-xs text-slate-500 mb-3">Solved / Remaining / % Complete are computed automatically from the Problem Log below — they are not editable directly.</p>
+        <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+              <tr><th class="p-3">Actions</th><th class="p-3">Topic</th><th class="p-3">Target #</th><th class="p-3">Solved</th><th class="p-3">Remaining</th><th class="p-3">% Complete</th></tr>
+            </thead>
+            <tbody id="dsa-topics-tbody" class="divide-y divide-slate-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-xl font-bold text-emerald-400">DSA Problem Log</h2>
+        </div>
+        <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+              <tr><th class="p-3">Actions</th><th class="p-3">Date</th><th class="p-3">Topic</th><th class="p-3">Problem Name</th><th class="p-3">Platform</th><th class="p-3">Difficulty</th><th class="p-3">Status</th></tr>
+            </thead>
+            <tbody id="dsa-log-tbody" class="divide-y divide-slate-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRIO TAB -->
+    <div id="view-crio" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center"><h2 class="text-xl font-bold text-blue-400">Crio Course</h2></div>
+      <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+            <tr><th class="p-3">Actions</th><th class="p-3">Date</th><th class="p-3">Module</th><th class="p-3">Task / Milestone</th><th class="p-3">Status</th><th class="p-3">Date Completed</th><th class="p-3">Hours Spent</th><th class="p-3">Notes</th></tr>
+          </thead>
+          <tbody id="crio-tbody" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- JS TAB -->
+    <div id="view-js" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center flex-wrap gap-3">
+        <h2 class="text-xl font-bold text-amber-400">JavaScript Tracker</h2>
+        <div class="flex gap-2">
+          <input id="js-search" oninput="renderTable('JS','js-tbody')" placeholder="Search topic / subtopic..." class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:border-amber-500 w-52">
+          <select id="js-filter" onchange="renderTable('JS','js-tbody')" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:border-amber-500">
+            <option value="">All Statuses</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+            <tr><th class="p-3">Actions</th><th class="p-3">Date</th><th class="p-3">Topic</th><th class="p-3">Subtopic</th><th class="p-3">Priority</th><th class="p-3">Status</th><th class="p-3">Date Revision</th><th class="p-3">Resource</th><th class="p-3">Notes</th></tr>
+          </thead>
+          <tbody id="js-tbody" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REACT TAB -->
+    <div id="view-react" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center flex-wrap gap-3">
+        <h2 class="text-xl font-bold text-cyan-400">React Tracker</h2>
+        <div class="flex gap-2">
+          <input id="react-search" oninput="renderTable('React','react-tbody')" placeholder="Search topic / subtopic..." class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:border-cyan-500 w-52">
+          <select id="react-filter" onchange="renderTable('React','react-tbody')" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:border-cyan-500">
+            <option value="">All Statuses</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+            <tr><th class="p-3">Actions</th><th class="p-3">Date</th><th class="p-3">Topic</th><th class="p-3">Subtopic</th><th class="p-3">Priority</th><th class="p-3">Status</th><th class="p-3">Date Revision</th><th class="p-3">Resource</th><th class="p-3">Notes</th></tr>
+          </thead>
+          <tbody id="react-tbody" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GYM TAB -->
+    <div id="view-gym" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center"><h2 class="text-xl font-bold text-lime-400">Gym & Fitness Log</h2></div>
+      <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+            <tr><th class="p-3">Actions</th><th class="p-3">Date</th><th class="p-3">Workout Type</th><th class="p-3">Exercises / Sets x Reps</th><th class="p-3">Duration (min)</th><th class="p-3">Weight (kg)</th><th class="p-3">Cardio (min)</th><th class="p-3">Streak</th><th class="p-3">Notes</th></tr>
+          </thead>
+          <tbody id="gym-tbody" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROJECTS TAB -->
+    <div id="view-projects" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center"><h2 class="text-xl font-bold text-purple-400">Portfolio Projects</h2></div>
+      <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+            <tr><th class="p-3">Actions</th><th class="p-3">Project Name</th><th class="p-3">Priority</th><th class="p-3">Status</th><th class="p-3">Target Date</th><th class="p-3">Tech Stack</th><th class="p-3">Key Features</th><th class="p-3">GitHub Link</th><th class="p-3">Live Link</th><th class="p-3">Notes</th></tr>
+          </thead>
+          <tbody id="projects-tbody" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MACHINE CODING TAB -->
+    <div id="view-mc" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center"><h2 class="text-xl font-bold text-pink-400">Machine Coding</h2></div>
+      <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+            <tr><th class="p-3">Actions</th><th class="p-3">Date</th><th class="p-3">Problem</th><th class="p-3">Lang/Framework</th><th class="p-3">Time Limit</th><th class="p-3">Time Taken</th><th class="p-3">Difficulty</th><th class="p-3">Status</th><th class="p-3">Key Learnings</th><th class="p-3">Link/Repo</th></tr>
+          </thead>
+          <tbody id="mc-tbody" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INTERVIEWS TAB -->
+    <div id="view-interviews" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center"><h2 class="text-xl font-bold text-indigo-400">Interviews & Applications</h2></div>
+      <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px]">
+            <tr><th class="p-3">Actions</th><th class="p-3">Days Ago</th><th class="p-3">Date Applied</th><th class="p-3">Company</th><th class="p-3">Role</th><th class="p-3">Source</th><th class="p-3">Status</th><th class="p-3">Next Step</th><th class="p-3">Follow-up Date</th><th class="p-3">Round</th><th class="p-3">Contact/Referral</th><th class="p-3">Notes</th></tr>
+          </thead>
+          <tbody id="interviews-tbody" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ADD / EDIT MODAL -->
+  <div id="addModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-card bg-slate-900 border border-slate-700/80 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative my-8">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+        <h3 id="modalTitle" class="text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="edit" class="w-5 h-5 text-indigo-400"></i> Add / Edit Entry
+        </h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form id="entryForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Select Track</label>
+          <select id="modalCategory" onchange="generateModalFields()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-indigo-500">
+            <option value="DSALog">DSA Problem Log</option>
+            <option value="DSATopics">DSA Topics</option>
+            <option value="Crio">Crio Course</option>
+            <option value="JS">JavaScript</option>
+            <option value="React">React</option>
+            <option value="Gym">Gym</option>
+            <option value="Projects">Projects</option>
+            <option value="MC">Machine Coding</option>
+            <option value="Interviews">Interviews</option>
+          </select>
+        </div>
+
+        <div id="dynamicFields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-xs font-medium bg-indigo-600 text-white shadow-lg hover:bg-indigo-700">Save Data</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ---------------------------------------------------------------------
+    // DATA STORES
+    // Note: this runs entirely in memory (no localStorage — not supported
+    // in this environment). Use Export / Import to save and reload data
+    // across sessions.
+    // ---------------------------------------------------------------------
+    let db = {
+      // One row per topic being tracked. Solved / Remaining / % are
+      // computed live from DSALog, never stored directly. New topics can
+      // be added anytime via the "Add Topic" button on the DSA tab (or
+      // Add Entry -> Select Track -> DSA Topics).
+      DSATopics: [
+        { Topic: "Stack", "Target #": "26" }
+      ],
+      DSALog: [
+        { Date: "2026-07-17", Topic: "Stack", "Problem Name": "Next Largest Element Right", Platform: "Local", Difficulty: "Medium", Status: "Done" },
+        { Date: "2026-07-18", Topic: "Stack", "Problem Name": "Next Largest Element Left", Platform: "Local", Difficulty: "Medium", Status: "Done" },
+        { Date: "2026-07-18", Topic: "Stack", "Problem Name": "Nearest Smallest Element Left", Platform: "Local", Difficulty: "Medium", Status: "Done" },
+        { Date: "2026-07-18", Topic: "Stack", "Problem Name": "Nearest Smallest Element Right", Platform: "Local", Difficulty: "Medium", Status: "Done" },
+        { Date: "2026-07-18", Topic: "Stack", "Problem Name": "Stock Span Problem", Platform: "Local", Difficulty: "Hard", Status: "Done" },
+        { Date: "2026-07-20", Topic: "Stack", "Problem Name": "Maximum Histogram Problem", Platform: "Local", Difficulty: "Hard", Status: "Done" },
+        { Date: "2026-07-21", Topic: "Stack", "Problem Name": "Trapping Rain Water", Platform: "Local", Difficulty: "Hard", Status: "Done" }
+      ],
+      Crio: [
+        { Date: "2026-07-17", Module: "FE-101", "Task / Milestone": "Completed Git Module", Status: "Done", "Date Completed": "2026-07-17", "Hours Spent": "", Notes: "" },
+        { Date: "2026-07-17", Module: "FE-101", "Task / Milestone": "Learn about Flexbox", Status: "Done", "Date Completed": "2026-07-17", "Hours Spent": "", Notes: "" },
+        { Date: "2026-07-18", Module: "FE-101", "Task / Milestone": "Learn about Responsive Designs", Status: "Done", "Date Completed": "", "Hours Spent": "", Notes: "" },
+        { Date: "2026-07-18", Module: "FE-101", "Task / Milestone": "Finish Discovery Section of XCruise Project", Status: "Done", "Date Completed": "2026-07-20", "Hours Spent": "", Notes: "" },
+        { Date: "2026-07-21", Module: "FE-101", "Task / Milestone": "XCruise Project Completed", Status: "Done", "Date Completed": "2026-07-21", "Hours Spent": "", Notes: "" },
+        { Date: "2026-07-21", Module: "FE-101", "Task / Milestone": "Completed Module 8 - Bootstrap", Status: "Done", "Date Completed": "2026-07-21", "Hours Spent": "", Notes: "" }
+      ],
+      JS: [
+        { Date: "2026-07-16", Topic: "var vs let vs const", Subtopic: "Scope, Hoisting, TDZ, Global Object, Illegal Shadowing", Priority: "High", Status: "Done", "Date Revision": "2026-07-19", Resource: "", Notes: "" },
+        { Date: "2026-07-16", Topic: "Execution Context", Subtopic: "Memory Creation Phase, Execution Phase, GEC, FEC", Priority: "High", Status: "Done", "Date Revision": "2026-07-19", Resource: "", Notes: "" },
+        { Date: "2026-07-16", Topic: "Lexical Environment", Subtopic: "Environment Record, Outer Reference", Priority: "High", Status: "Done", "Date Revision": "2026-07-19", Resource: "", Notes: "" },
+        { Date: "2026-07-16", Topic: "Scope Chain", Subtopic: "Variable Resolution, Shadowing", Priority: "High", Status: "Done", "Date Revision": "2026-07-19", Resource: "", Notes: "" },
+        { Date: "2026-07-16", Topic: "Call Stack", Subtopic: "Push, Pop, LIFO, Stack Overflow", Priority: "High", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Function Declaration", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Function Expression", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Declaration vs Expression", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "First-Class Functions", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Callback Functions", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Higher-Order Function", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Arrow Function", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Closure", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Data Hiding", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Memoization", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Currying", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Once Function", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-18", Topic: "Infinite Currying", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "Objects", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "Destructuring", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "Rest Operator", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "Spread Operator", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "Shallow Copy", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "Deep Copy", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "this Keyword Intro", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "call method", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "apply method", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "bind method", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-20", Topic: "Arrow Function this", Subtopic: "", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "map()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "filter()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "reduce()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "forEach()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "find()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "findIndex()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "some()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "every()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "sort()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "flat()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Array & Array Method", Subtopic: "flatMap()", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Async JavaScript", Subtopic: "Event Loop, Promises, async/await", Priority: "High", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" }
+      ],
+      React: [
+        { Date: "2026-07-21", Topic: "React Fundamentals", Subtopic: "React Element", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "React Fundamentals", Subtopic: "JSX Compilation", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "React Fundamentals", Subtopic: "React Component", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "React Fundamentals", Subtopic: "Props", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "React Fundamentals", Subtopic: "How useState works()", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "React Fundamentals", Subtopic: "Lazy Initialization", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "React Fundamentals", Subtopic: "Update Queues & Functional Update", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "React Fundamentals", Subtopic: "Batching", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Browser Rendering Pipeline", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Virtual DOM vs Real DOM", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Reconciliation", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Diffing Algorithm", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "React Fiber Introduction", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Fiber Node Structure", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Alternate", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Scheduler", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Fiber Priority", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Fiber Lane", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Fiber Update Queue", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Render vs Commit Phase", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "useEffect After Commit", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "2026-07-21", Topic: "Rendering", Subtopic: "Rendering Strategies", Priority: "Medium", Status: "Done", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Hooks Internal", Subtopic: "useRef", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Hooks Internal", Subtopic: "useMemo", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Hooks Internal", Subtopic: "useCallback", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Hooks Internal", Subtopic: "React.memo — when does it bail out", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Hooks Internal", Subtopic: "React.memo internals", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Hooks Internal", Subtopic: "useMemo vs React.memo", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Hooks Internal", Subtopic: "useState internals", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" },
+        { Date: "", Topic: "Hooks Internal", Subtopic: "DevTools Profiler", Priority: "Medium", Status: "Not Started", "Date Revision": "", Resource: "", Notes: "" }
+      ],
+      Gym: [],
+      Projects: [
+        { "Project Name": "XProfile", Priority: "Low", Status: "Done", "Target Date": "2026-07-17", "Tech Stack": "HTML,CSS", "Key Features": "", "GitHub Link": "", "Live Link": "", Notes: "" },
+        { "Project Name": "ShopSphere - Shopping App", Priority: "Medium", Status: "In Progress", "Target Date": "2026-07-24", "Tech Stack": "React,Tailwind CSS,ShadCN ui", "Key Features": "Lazy Loading,Code Splitting,Suspense, Debouncing, Memoization,useCallback,React.memo,Infinite Scroll,Skeleton Loading,Image Lazy Load,Custom Hooks,Error Boundary,Context API,Local Storage, Custom Toast", "GitHub Link": "", "Live Link": "", Notes: "" }
+      ],
+      MC: [
+        { Date: "", Problem: "Todo App", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Accordion", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Tabs", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Modal", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Toast", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Debounced Search", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Infinite Scroll", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Pagination", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "File Explorer", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Nested Comments", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Data Table", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Kanban Board", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Image Carousel", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "Chat UI", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" },
+        { Date: "", Problem: "OTP Component", "Language/Framework": "", "Time Limit (min)": "", "Time Taken (min)": "", Difficulty: "Medium", Status: "Not Started", "Key Learnings": "", "Link/Repo": "" }
+      ],
+      Interviews: [],
+      TimeAlloc: [
+        { Area: "DSA", Target: "2hr" },
+        { Area: "Frontend System Design / React & JS depth", Target: "" },
+        { Area: "Applications & Referrals", Target: "" },
+        { Area: "Behavioral Prep", Target: "" }
+      ]
+    };
+
+    let currentEditIndex = -1;
+    let currentEditCategory = '';
+    let currentTab = 'overview';
+    let momentumChart = null;
+
+    function safeIcons() {
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        try { lucide.createIcons(); } catch (e) { /* icons are cosmetic, ignore */ }
+      }
+    }
+
+    const tabDefaultCategory = {
+      overview: 'DSALog', dsa: 'DSALog', crio: 'Crio', js: 'JS', react: 'React',
+      gym: 'Gym', projects: 'Projects', mc: 'MC', interviews: 'Interviews'
+    };
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.replace('border-indigo-500', 'border-transparent'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.replace('text-indigo-400', 'text-slate-400'));
+
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      activeBtn.classList.replace('border-transparent', 'border-indigo-500');
+      activeBtn.classList.replace('text-slate-400', 'text-indigo-400');
+      if (tabId === 'overview') renderOverviewStats();
+    }
+
+    const fieldSchemas = {
+      DSATopics: ['Topic', 'Target #|number'],
+      DSALog: ['Date|date', 'Topic', 'Problem Name', 'Platform', 'Difficulty|select|Easy,Medium,Hard', 'Status|select|Not Started,In Progress,Done'],
+      Crio: ['Date|date', 'Module', 'Task / Milestone', 'Status|select|In Progress,Done', 'Date Completed|date', 'Hours Spent|number', 'Notes|textarea'],
+      JS: ['Date|date', 'Topic', 'Subtopic', 'Priority|select|Low,Medium,High', 'Status|select|Not Started,In Progress,Done', 'Date Revision|date', 'Resource', 'Notes|textarea'],
+      React: ['Date|date', 'Topic', 'Subtopic', 'Priority|select|Low,Medium,High', 'Status|select|Not Started,In Progress,Done', 'Date Revision|date', 'Resource', 'Notes|textarea'],
+      Gym: ['Date|date', 'Workout Type', 'Exercises / Sets x Reps|textarea', 'Duration (min)|number', 'Weight (kg)|number', 'Cardio (min)|number', 'Streak|number', 'Notes|textarea'],
+      Projects: ['Project Name', 'Priority|select|Low,Medium,High', 'Status|select|Planning,In Progress,Done', 'Target Date|date', 'Tech Stack', 'Key Features|textarea', 'GitHub Link', 'Live Link', 'Notes|textarea'],
+      MC: ['Date|date', 'Problem', 'Language/Framework', 'Time Limit (min)|number', 'Time Taken (min)|number', 'Difficulty|select|Easy,Medium,Hard', 'Status|select|Not Started,In Progress,Done', 'Key Learnings|textarea', 'Link/Repo'],
+      Interviews: ['Date Applied|date', 'Company', 'Role', 'Source', 'Status|select|Applied,OA,Phone Screen,Interview R1,Interview R2,Interview R3,Offer,Rejected', 'Next Step', 'Follow-up Date|date', 'Round', 'Contact / Referral', 'Notes|textarea']
+    };
+
+    function openModal(category = null, index = -1) {
+      if (category === null) category = tabDefaultCategory[currentTab] || 'DSALog';
+      document.getElementById('addModal').classList.remove('hidden');
+      const catSelect = document.getElementById('modalCategory');
+
+      if (index === -1) {
+        document.getElementById('modalTitle').innerHTML = `<i data-lucide="plus-circle" class="w-5 h-5 text-indigo-400"></i> Add New Entry`;
+        catSelect.value = category;
+        catSelect.disabled = false;
+        currentEditIndex = -1;
+        generateModalFields();
+      } else {
+        document.getElementById('modalTitle').innerHTML = `<i data-lucide="edit" class="w-5 h-5 text-amber-400"></i> Update Entry`;
+        catSelect.value = category;
+        catSelect.disabled = true;
+        currentEditIndex = index;
+        currentEditCategory = category;
+        generateModalFields();
+        populateFormForEdit(category, index);
+      }
+      safeIcons();
+    }
+
+    function closeModal() {
+      document.getElementById('addModal').classList.add('hidden');
+      document.getElementById('entryForm').reset();
+    }
+
+    function generateModalFields() {
+      const cat = document.getElementById('modalCategory').value;
+      const fields = fieldSchemas[cat];
+      const container = document.getElementById('dynamicFields');
+      container.innerHTML = '';
+
+      fields.forEach(f => {
+        const parts = f.split('|');
+        const label = parts[0];
+        const type = parts[1] || 'text';
+        const id = 'field-' + label.replace(/[^a-zA-Z0-9]/g, '');
+
+        let inputHtml = '';
+        const baseClasses = "w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-indigo-500";
+
+        if (type === 'textarea') {
+          inputHtml = `<textarea id="${id}" rows="2" class="${baseClasses} md:col-span-2"></textarea>`;
+        } else if (type === 'select') {
+          const options = parts[2].split(',').map(o => `<option value="${o}">${o}</option>`).join('');
+          inputHtml = `<select id="${id}" class="${baseClasses}">${options}</select>`;
+        } else {
+          inputHtml = `<input type="${type}" id="${id}" class="${baseClasses}">`;
+        }
+
+        const wrapClass = type === 'textarea' ? 'md:col-span-2' : '';
+        container.innerHTML += `
+          <div class="${wrapClass}">
+            <label class="block text-[11px] font-semibold text-slate-400 mb-1 uppercase tracking-wider">${label}</label>
+            ${inputHtml}
+          </div>
+        `;
+      });
+    }
+
+    function populateFormForEdit(category, index) {
+      const dataRow = db[category][index];
+      const fields = fieldSchemas[category];
+
+      fields.forEach(f => {
+        const label = f.split('|')[0];
+        const id = 'field-' + label.replace(/[^a-zA-Z0-9]/g, '');
+        if (document.getElementById(id)) {
+          document.getElementById(id).value = dataRow[label] || '';
+        }
+      });
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const cat = document.getElementById('modalCategory').value;
+      const fields = fieldSchemas[cat];
+      const rowData = {};
+
+      fields.forEach(f => {
+        const label = f.split('|')[0];
+        const id = 'field-' + label.replace(/[^a-zA-Z0-9]/g, '');
+        rowData[label] = document.getElementById(id).value;
+      });
+
+      if (cat === 'DSATopics' && currentEditIndex === -1) {
+        const exists = db.DSATopics.some(t => (t.Topic || '').trim().toLowerCase() === (rowData.Topic || '').trim().toLowerCase());
+        if (exists) {
+          alert('That topic already exists in DSA Topic Progress.');
+          return;
+        }
+      }
+
+      if (currentEditIndex === -1) {
+        db[cat].push(rowData);
+      } else {
+        db[cat][currentEditIndex] = rowData;
+      }
+
+      renderAllTables();
+      closeModal();
+    }
+
+    function deleteEntry(category, index) {
+      if (!confirm('Delete this entry? This cannot be undone.')) return;
+      db[category].splice(index, 1);
+      renderAllTables();
+    }
+
+    function dsaTopicStats(topic) {
+      const target = parseInt(topic['Target #']) || 0;
+      const solved = db.DSALog.filter(r => r.Topic === topic.Topic && r.Status === 'Done').length;
+      const remaining = Math.max(target - solved, 0);
+      const pct = target > 0 ? (solved / target) * 100 : 0;
+      return { target, solved, remaining, pct };
+    }
+
+    function totalDSASolved() {
+      return db.DSALog.filter(r => r.Status === 'Done').length;
+    }
+    function totalDSATarget() {
+      return db.DSATopics.reduce((acc, t) => acc + (parseInt(t['Target #']) || 0), 0);
+    }
+
+    function renderDSATopics() {
+      const tbody = document.getElementById('dsa-topics-tbody');
+      let rows = db.DSATopics.map((t, index) => {
+        const s = dsaTopicStats(t);
+        return `
+          <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 last:border-0">
+            <td class="p-3 flex gap-1">
+              <button onclick="openModal('DSATopics', ${index})" class="text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 px-2 py-1 rounded text-xs">Edit</button>
+              <button onclick="deleteEntry('DSATopics', ${index})" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 px-2 py-1 rounded text-xs">Delete</button>
+            </td>
+            <td class="p-3 font-medium text-white">${t.Topic}</td>
+            <td class="p-3 text-xs text-slate-300">${s.target || '-'}</td>
+            <td class="p-3 text-xs text-emerald-400 font-semibold">${s.solved}</td>
+            <td class="p-3 text-xs text-slate-300">${s.remaining}</td>
+            <td class="p-3 text-xs"><span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300">${s.pct.toFixed(1)}%</span></td>
+          </tr>
+        `;
+      }).join('');
+      if (db.DSATopics.length === 0) {
+        rows = `<tr><td colspan="6" class="p-6 text-center text-slate-500 text-xs">No topics yet. Click "Add Topic" to start tracking a new one.</td></tr>`;
+      }
+      tbody.innerHTML = rows;
+    }
+
+    function renderDSALog() {
+      const tbody = document.getElementById('dsa-log-tbody');
+      const fields = fieldSchemas.DSALog.map(f => f.split('|')[0]);
+      let rows = db.DSALog.map((row, index) => {
+        let tr = `<tr class="hover:bg-slate-800/40 border-b border-slate-800/50 last:border-0">`;
+        tr += `<td class="p-3 flex gap-1">
+                 <button onclick="openModal('DSALog', ${index})" class="text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 px-2 py-1 rounded text-xs">Edit</button>
+                 <button onclick="deleteEntry('DSALog', ${index})" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 px-2 py-1 rounded text-xs">Delete</button>
+               </td>`;
+        fields.forEach(f => {
+          let val = row[f] || '-';
+          if (f === 'Status') {
+            const color = val === 'Done' ? 'text-emerald-400 bg-emerald-500/10' : val === 'In Progress' ? 'text-amber-400 bg-amber-500/10' : 'text-slate-400 bg-slate-800';
+            val = `<span class="px-2 py-0.5 rounded text-[10px] font-medium ${color}">${val}</span>`;
+          }
+          tr += `<td class="p-3 text-xs text-slate-300 max-w-[200px] truncate" title="${row[f] || ''}">${val}</td>`;
+        });
+        tr += `</tr>`;
+        return tr;
+      }).join('');
+      if (db.DSALog.length === 0) {
+        rows = `<tr><td colspan="7" class="p-6 text-center text-slate-500 text-xs">No problems logged yet.</td></tr>`;
+      }
+      tbody.innerHTML = rows;
+    }
+
+    function renderOverviewStats() {
+      const dsaSolved = totalDSASolved();
+      const dsaTarget = totalDSATarget();
+      const jsDone = db.JS.filter(r => r.Status === 'Done').length;
+      const reactDone = db.React.filter(r => r.Status === 'Done').length;
+      const crioDone = db.Crio.filter(r => r.Status === 'Done').length;
+      const projDone = db.Projects.filter(r => r.Status === 'Done').length;
+      const mcDone = db.MC.filter(r => r.Status === 'Done').length;
+      const appsSent = db.Interviews.filter(r => r.Company).length;
+      const offers = db.Interviews.filter(r => r.Status === 'Offer').length;
+
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
+      const gymSessions = db.Gym.filter(r => r.Date && new Date(r.Date) >= sevenDaysAgo && new Date(r.Date) <= now).length;
+
+      document.getElementById('stat-dsa').innerText = `${dsaSolved} / ${dsaTarget || '-'}`;
+      document.getElementById('stat-js').innerText = `${jsDone} / ${db.JS.length}`;
+      document.getElementById('stat-react').innerText = `${reactDone} / ${db.React.length}`;
+      document.getElementById('stat-projects').innerText = `${projDone} / ${db.Projects.length}`;
+      document.getElementById('stat-gym').innerText = `${gymSessions}`;
+      document.getElementById('stat-mc').innerText = `${mcDone} / ${db.MC.length}`;
+      document.getElementById('stat-apps').innerText = `${appsSent}`;
+      document.getElementById('stat-offers').innerText = `${offers}`;
+
+      const overviewData = [
+        { area: 'DSA Problems', done: dsaSolved, total: dsaTarget, notes: `${db.DSATopics.length} topic(s) tracked` },
+        { area: "Crio's Course Tasks", done: crioDone, total: db.Crio.length, notes: 'Frontend modules' },
+        { area: 'React Topics', done: reactDone, total: db.React.length, notes: 'Fundamentals + Rendering done, Hooks Internal pending' },
+        { area: 'JS Topics', done: jsDone, total: db.JS.length, notes: 'Core execution & prototypes done, Array/Async pending' },
+        { area: 'Gym Sessions (7d)', done: gymSessions, total: 7, notes: 'Rolling 7-day window' },
+        { area: 'Projects', done: projDone, total: db.Projects.length, notes: 'XProfile done, ShopSphere in progress' },
+        { area: 'Machine Coding Rounds', done: mcDone, total: db.MC.length, notes: `${db.MC.length} practice problems logged` },
+        { area: 'Applications Sent', done: appsSent, total: '-', notes: 'Applications log' },
+        { area: 'Offers', done: offers, total: '-', notes: '' }
+      ];
+
+      const tbody = document.getElementById('overview-tbody');
+      tbody.innerHTML = overviewData.map(row => {
+        const pct = (row.total === '-' || !row.total) ? '-' : `${((row.done / row.total) * 100).toFixed(1)}%`;
+        return `
+          <tr class="hover:bg-slate-800/40 border-b border-slate-800/50">
+            <td class="p-3 font-medium text-white">${row.area}</td>
+            <td class="p-3 text-emerald-400 font-bold">${row.done}</td>
+            <td class="p-3 text-slate-300">${row.total}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold bg-indigo-500/10 text-indigo-300">${pct}</span></td>
+            <td class="p-3 text-slate-400 text-xs">${row.notes}</td>
+          </tr>
+        `;
+      }).join('');
+
+      renderTimeAllocation();
+      renderFunnel();
+      renderMomentumChart();
+    }
+
+    function renderTimeAllocation() {
+      const tbody = document.getElementById('timealloc-tbody');
+      tbody.innerHTML = db.TimeAlloc.map((row, index) => `
+        <tr class="hover:bg-slate-800/40">
+          <td class="p-2.5 text-slate-300">${row.Area}</td>
+          <td class="p-2.5">
+            <input value="${row.Target}" placeholder="e.g. 2hr or 25%"
+              onchange="updateTimeAlloc(${index}, this.value)"
+              class="bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white w-28 outline-none focus:border-indigo-500">
+          </td>
+        </tr>
+      `).join('');
+    }
+    function updateTimeAlloc(index, value) {
+      db.TimeAlloc[index].Target = value;
+    }
+
+    function renderFunnel() {
+      const stages = ['Applied', 'OA', 'Phone Screen', 'Interview R1', 'Interview R2', 'Interview R3', 'Offer', 'Rejected'];
+      const counts = stages.map(s => db.Interviews.filter(r => r.Status === s).length);
+      const max = Math.max(1, ...counts);
+      const container = document.getElementById('funnel-container');
+      container.innerHTML = stages.map((s, i) => {
+        const width = Math.max(4, (counts[i] / max) * 100);
+        const color = s === 'Rejected' ? 'bg-rose-500' : s === 'Offer' ? 'bg-emerald-500' : 'bg-indigo-500';
+        return `
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-1"><span>${s}</span><span class="text-slate-300 font-semibold">${counts[i]}</span></div>
+            <div class="w-full bg-slate-800 rounded-full h-2.5"><div class="${color} h-2.5 rounded-full transition-all" style="width:${width}%"></div></div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getWeekRanges(numWeeks) {
+      const weeks = [];
+      const now = new Date();
+      const day = now.getDay();
+      const diffToMonday = (day === 0 ? -6 : 1 - day);
+      const monday = new Date(now);
+      monday.setHours(0, 0, 0, 0);
+      monday.setDate(now.getDate() + diffToMonday);
+      for (let i = numWeeks - 1; i >= 0; i--) {
+        const start = new Date(monday);
+        start.setDate(monday.getDate() - 7 * i);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+        weeks.push({ start, end });
+      }
+      return weeks;
+    }
+
+    function renderMomentumChart() {
+      const canvas = document.getElementById('momentumChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+      const weeks = getWeekRanges(8);
+      const counts = weeks.map(w => db.DSALog.filter(r => {
+        if (r.Status !== 'Done' || !r.Date) return false;
+        const d = new Date(r.Date);
+        return d >= w.start && d <= w.end;
+      }).length);
+      const labels = weeks.map(w => `${w.start.getMonth() + 1}/${w.start.getDate()}`);
+
+      if (momentumChart) momentumChart.destroy();
+      momentumChart = new Chart(canvas, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Problems Solved', data: counts, backgroundColor: '#34d399', borderRadius: 6, maxBarThickness: 36 }] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { color: '#94a3b8', precision: 0, stepSize: 1 }, grid: { color: '#1e293b' } },
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function renderTable(category, tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      const fields = fieldSchemas[category].map(f => f.split('|')[0]);
+
+      let rows = db[category];
+
+      const searchEl = document.getElementById(category === 'JS' ? 'js-search' : category === 'React' ? 'react-search' : null);
+      const filterEl = document.getElementById(category === 'JS' ? 'js-filter' : category === 'React' ? 'react-filter' : null);
+      if (searchEl) {
+        const q = searchEl.value.trim().toLowerCase();
+        if (q) rows = rows.filter(r => (r.Topic || '').toLowerCase().includes(q) || (r.Subtopic || '').toLowerCase().includes(q));
+      }
+      if (filterEl && filterEl.value) {
+        rows = rows.filter(r => r.Status === filterEl.value);
+      }
+
+      const originalIndexOf = (row) => db[category].indexOf(row);
+
+      tbody.innerHTML = rows.map((row) => {
+        const index = originalIndexOf(row);
+        let trHtml = `<tr class="hover:bg-slate-800/40 border-b border-slate-800/50 last:border-0 transition-colors">`;
+
+        trHtml += `<td class="p-3 flex gap-1">
+                     <button onclick="openModal('${category}', ${index})" class="text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 px-2 py-1 rounded text-xs">Edit</button>
+                     <button onclick="deleteEntry('${category}', ${index})" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 px-2 py-1 rounded text-xs">Delete</button>
+                   </td>`;
+
+        if (category === 'Interviews') {
+          const days = row['Date Applied'] ? Math.floor((new Date() - new Date(row['Date Applied'])) / (1000 * 60 * 60 * 24)) : '-';
+          trHtml += `<td class="p-3 text-xs font-mono text-slate-400">${days}${days !== '-' ? 'd' : ''}</td>`;
+        }
+
+        fields.forEach(f => {
+          let val = row[f] || '-';
+          if (f === 'Status') {
+            const color = val.includes('Done') || val.includes('Offer') ? 'text-emerald-400 bg-emerald-500/10' :
+              val.includes('Progress') || val.includes('Interview') || val === 'OA' || val === 'Phone Screen' ? 'text-amber-400 bg-amber-500/10' :
+              val.includes('Rejected') ? 'text-rose-400 bg-rose-500/10' : 'text-slate-400 bg-slate-800';
+            val = `<span class="px-2 py-0.5 rounded text-[10px] font-medium ${color}">${val}</span>`;
+          }
+          trHtml += `<td class="p-3 text-xs text-slate-300 max-w-[200px] truncate" title="${row[f] || ''}">${val}</td>`;
+        });
+
+        trHtml += `</tr>`;
+        return trHtml;
+      }).join('');
+
+      if (rows.length === 0) {
+        const colCount = fields.length + (category === 'Interviews' ? 2 : 1);
+        tbody.innerHTML = `<tr><td colspan="${colCount}" class="p-6 text-center text-slate-500 text-xs">No entries match. Click Add Entry to start tracking.</td></tr>`;
+      }
+    }
+
+    function renderAllTables() {
+      renderOverviewStats();
+      renderDSATopics();
+      renderDSALog();
+      renderTable('Crio', 'crio-tbody');
+      renderTable('JS', 'js-tbody');
+      renderTable('React', 'react-tbody');
+      renderTable('Gym', 'gym-tbody');
+      renderTable('Projects', 'projects-tbody');
+      renderTable('MC', 'mc-tbody');
+      renderTable('Interviews', 'interviews-tbody');
+      safeIcons();
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prep-tracker-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          db = Object.assign(db, parsed);
+          renderAllTables();
+        } catch (err) {
+          alert('Could not read that file — make sure it is a JSON export from this tool.');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderAllTables();
+      safeIcons();
+    });
+  </script>
+</body>
+</html>
