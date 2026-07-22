@@ -1,0 +1,41 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h1{
+    color: blueviolet;
+    text-align: center;
+}
+
+#parent{
+    background-color: black;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+#child-1{
+    width: 100px;
+    height: 100px;
+    background-color: coral;
+    position: absolute;
+
+}
+#child-2{
+    width: 100px;
+    height: 100px;
+    background-color: aquamarine;
+    position: absolute;
+    left: 50px;
+    top: 50px;
+}
+#child-3{
+    width: 100px;
+    height: 100px;
+    background-color: yellow;
+    position: absolute;
+    top: 100px;
+    left: 100px;
+}
