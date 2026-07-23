@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prep Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.454.0/dist/umd/lucide.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #000000; }
+    .card { background: #0a0a0a; border: 1px solid #1a1a1a; }
+    .card:hover { border-color: #262626; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+    td, th { white-space: nowrap; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; opacity: 0.5; }
+    .dot { display: inline-block; width: 6px; height: 6px; border-radius: 999px; margin-right: 6px; }
+    .tab-btn { letter-spacing: 0.01em; }
+    .tab-btn.active { color: #fafafa; border-color: #fafafa; }
+    ::placeholder { color: #525252; }
+  </style>
+</head>
+<body class="bg-black text-zinc-200 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="border-b border-zinc-900 bg-black/95 sticky top-0 z-50 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="bg-zinc-100 p-1.5 rounded-lg text-black">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+        </div>
+        <h1 class="font-semibold text-[15px] leading-none text-zinc-50 tracking-tight">Prep Command Center</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="storage-indicator" class="hidden sm:flex items-center text-[11px] text-zinc-600 mr-1"></span>
+        <button onclick="exportData()" title="Download your data as a JSON file" class="hidden sm:flex bg-zinc-950 border border-zinc-800 hover:border-zinc-600 text-zinc-300 font-medium text-xs px-3 py-2 rounded-lg items-center gap-1.5 transition-colors">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
+        </button>
+        <button onclick="document.getElementById('importFile').click()" title="Load a previously exported JSON file" class="hidden sm:flex bg-zinc-950 border border-zinc-800 hover:border-zinc-600 text-zinc-300 font-medium text-xs px-3 py-2 rounded-lg items-center gap-1.5 transition-colors">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import
+        </button>
+        <input type="file" id="importFile" accept="application/json" class="hidden" onchange="importData(event)">
+        <button onclick="openModal()" class="bg-zinc-100 hover:bg-white text-black font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Entry
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 overflow-x-auto no-scrollbar border-t border-zinc-900 pt-1">
+      <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active px-4 py-2.5 text-sm font-medium border-b-2 border-zinc-50 text-zinc-50 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Overview</button>
+      <button onclick="switchTab('dsa')" id="tab-dsa" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="code-2" class="w-4 h-4"></i> DSA</button>
+      <button onclick="switchTab('crio')" id="tab-crio" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="graduation-cap" class="w-4 h-4"></i> Crio Course</button>
+      <button onclick="switchTab('js')" id="tab-js" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="file-json" class="w-4 h-4"></i> JS</button>
+      <button onclick="switchTab('react')" id="tab-react" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="atom" class="w-4 h-4"></i> React</button>
+      <button onclick="switchTab('gym')" id="tab-gym" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="dumbbell" class="w-4 h-4"></i> Gym</button>
+      <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="folder-git-2" class="w-4 h-4"></i> Projects</button>
+      <button onclick="switchTab('mc')" id="tab-mc" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="cpu" class="w-4 h-4"></i> Machine Coding</button>
+      <button onclick="switchTab('interviews')" id="tab-interviews" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center gap-2 transition-colors shrink-0"><i data-lucide="briefcase" class="w-4 h-4"></i> Interviews</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
+
+    <!-- OVERVIEW TAB -->
+    <div id="view-overview" class="tab-content space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="card p-5 rounded-xl">
+          <p class="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">DSA Solved</p>
+          <p id="stat-dsa" class="text-2xl font-semibold text-zinc-50 mt-1">0 / -</p>
+        </div>
+        <div class="card p-5 rounded-xl">
+          <p class="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">JavaScript Topics</p>
+          <p id="stat-js" class="text-2xl font-semibold text-zinc-50 mt-1">0 / 0</p>
+        </div>
+        <div class="card p-5 rounded-xl">
+          <p class="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">React Topics</p>
+          <p id="stat-react" class="text-2xl font-semibold text-zinc-50 mt-1">0 / 0</p>
+        </div>
+        <div class="card p-5 rounded-xl">
+          <p class="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">Projects Completed</p>
+          <p id="stat-projects" class="text-2xl font-semibold text-zinc-50 mt-1">0 / 0</p>
+        </div>
+        <div class="card p-5 rounded-xl">
+          <p class="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">Gym Sessions (7d)</p>
+          <p id="stat-gym" class="text-2xl font-semibold text-zinc-50 mt-1">0</p>
+        </div>
+        <div class="card p-5 rounded-xl">
+          <p class="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">Machine Coding</p>
+          <p id="stat-mc" class="text-2xl font-semibold text-zinc-50 mt-1">0 / 0</p>
+        </div>
+        <div class="card p-5 rounded-xl">
+          <p class="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">Applications Sent</p>
+          <p id="stat-apps" class="text-2xl font-semibold text-zinc-50 mt-1">0</p>
+        </div>
+        <div class="card p-5 rounded-xl">
+          <p class="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">Offers</p>
+          <p id="stat-offers" class="text-2xl font-semibold text-zinc-50 mt-1">0</p>
+        </div>
+      </div>
+
+      <div class="card p-6 rounded-xl">
+        <h2 class="text-sm font-semibold text-zinc-50 mb-4 flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-zinc-500"></i> Track Area Completion</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-zinc-300">
+            <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+              <tr><th class="p-3 font-medium">Track Area</th><th class="p-3 font-medium">Done</th><th class="p-3 font-medium">Total / Target</th><th class="p-3 font-medium">% Complete</th><th class="p-3 font-medium">Notes</th></tr>
+            </thead>
+            <tbody id="overview-tbody" class="divide-y divide-zinc-900"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Prep Time Allocation -->
+        <div class="card p-6 rounded-xl">
+          <h2 class="text-sm font-semibold text-zinc-50 mb-1 flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-zinc-500"></i> Prep Time Allocation</h2>
+          <p class="text-xs text-zinc-600 mb-4">Click a target value to edit it.</p>
+          <table class="w-full text-left text-sm text-zinc-300">
+            <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+              <tr><th class="p-2.5 font-medium">Area</th><th class="p-2.5 font-medium">Target</th></tr>
+            </thead>
+            <tbody id="timealloc-tbody" class="divide-y divide-zinc-900"></tbody>
+          </table>
+        </div>
+
+        <!-- Application Pipeline Funnel -->
+        <div class="card p-6 rounded-xl">
+          <h2 class="text-sm font-semibold text-zinc-50 mb-1 flex items-center gap-2"><i data-lucide="filter" class="w-4 h-4 text-zinc-500"></i> Application Pipeline Funnel</h2>
+          <p class="text-xs text-zinc-600 mb-4">Computed live from the Interviews tab.</p>
+          <div id="funnel-container" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- Weekly DSA Momentum -->
+      <div class="card p-6 rounded-xl">
+        <h2 class="text-sm font-semibold text-zinc-50 mb-1 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-zinc-500"></i> Weekly DSA Momentum</h2>
+        <p class="text-xs text-zinc-600 mb-4">Problems marked Done in the DSA Problem Log, grouped by week (last 8 weeks).</p>
+        <div class="h-64"><canvas id="momentumChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- DSA TAB -->
+    <div id="view-dsa" class="tab-content hidden space-y-6">
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-base font-semibold text-zinc-50">DSA Topic Progress</h2>
+          <button onclick="openModal('DSATopics')" class="bg-zinc-950 border border-zinc-800 hover:border-zinc-600 text-zinc-300 font-medium text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition-colors">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Topic
+          </button>
+        </div>
+        <p class="text-xs text-zinc-600 mb-3">Solved / Remaining / % Complete are computed automatically from the Problem Log below — they are not editable directly.</p>
+        <div class="card rounded-xl p-4 overflow-x-auto">
+          <table class="w-full text-left text-sm text-zinc-300">
+            <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+              <tr><th class="p-3 font-medium">Actions</th><th class="p-3 font-medium">Topic</th><th class="p-3 font-medium">Target #</th><th class="p-3 font-medium">Solved</th><th class="p-3 font-medium">Remaining</th><th class="p-3 font-medium">% Complete</th></tr>
+            </thead>
+            <tbody id="dsa-topics-tbody" class="divide-y divide-zinc-900"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-base font-semibold text-zinc-50">DSA Problem Log (Accordion by Topic)</h2>
+        </div>
+        <div id="dsa-accordion-container" class="space-y-3">
+          <!-- Accordions populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- CRIO TAB -->
+    <div id="view-crio" class="tab-content hidden space-y-4">
+      <h2 class="text-base font-semibold text-zinc-50">Crio Course</h2>
+      <div class="card rounded-xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-zinc-300">
+          <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+            <tr><th class="p-3 font-medium">Actions</th><th class="p-3 font-medium">Date</th><th class="p-3 font-medium">Module</th><th class="p-3 font-medium">Task / Milestone</th><th class="p-3 font-medium">Status</th><th class="p-3 font-medium">Date Completed</th><th class="p-3 font-medium">Hours Spent</th><th class="p-3 font-medium">Notes</th></tr>
+          </thead>
+          <tbody id="crio-tbody" class="divide-y divide-zinc-900"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- JS TAB -->
+    <div id="view-js" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center flex-wrap gap-3">
+        <h2 class="text-base font-semibold text-zinc-50">JavaScript Tracker</h2>
+        <div class="flex gap-2">
+          <input id="js-search" oninput="renderTable('JS','js-tbody')" placeholder="Search topic / subtopic..." class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200 outline-none focus:border-zinc-500 w-52">
+          <select id="js-filter" onchange="renderTable('JS','js-tbody')" class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200 outline-none focus:border-zinc-500">
+            <option value="">All Statuses</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+      </div>
+      <div class="card rounded-xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-zinc-300">
+          <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+            <tr><th class="p-3 font-medium">Actions</th><th class="p-3 font-medium">Date</th><th class="p-3 font-medium">Topic</th><th class="p-3 font-medium">Subtopic</th><th class="p-3 font-medium">Priority</th><th class="p-3 font-medium">Status</th><th class="p-3 font-medium">Date Revision</th><th class="p-3 font-medium">Resource</th><th class="p-3 font-medium">Notes</th></tr>
+          </thead>
+          <tbody id="js-tbody" class="divide-y divide-zinc-900"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REACT TAB -->
+    <div id="view-react" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center flex-wrap gap-3">
+        <h2 class="text-base font-semibold text-zinc-50">React Tracker</h2>
+        <div class="flex gap-2">
+          <input id="react-search" oninput="renderTable('React','react-tbody')" placeholder="Search topic / subtopic..." class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200 outline-none focus:border-zinc-500 w-52">
+          <select id="react-filter" onchange="renderTable('React','react-tbody')" class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200 outline-none focus:border-zinc-500">
+            <option value="">All Statuses</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+      </div>
+      <div class="card rounded-xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-zinc-300">
+          <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+            <tr><th class="p-3 font-medium">Actions</th><th class="p-3 font-medium">Date</th><th class="p-3 font-medium">Topic</th><th class="p-3 font-medium">Subtopic</th><th class="p-3 font-medium">Priority</th><th class="p-3 font-medium">Status</th><th class="p-3 font-medium">Date Revision</th><th class="p-3 font-medium">Resource</th><th class="p-3 font-medium">Notes</th></tr>
+          </thead>
+          <tbody id="react-tbody" class="divide-y divide-zinc-900"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GYM TAB -->
+    <div id="view-gym" class="tab-content hidden space-y-4">
+      <h2 class="text-base font-semibold text-zinc-50">Gym & Fitness Log</h2>
+      <div class="card rounded-xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-zinc-300">
+          <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+            <tr><th class="p-3 font-medium">Actions</th><th class="p-3 font-medium">Date</th><th class="p-3 font-medium">Workout Type</th><th class="p-3 font-medium">Exercises / Sets x Reps</th><th class="p-3 font-medium">Duration (min)</th><th class="p-3 font-medium">Weight (kg)</th><th class="p-3 font-medium">Cardio (min)</th><th class="p-3 font-medium">Streak</th><th class="p-3 font-medium">Notes</th></tr>
+          </thead>
+          <tbody id="gym-tbody" class="divide-y divide-zinc-900"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROJECTS TAB -->
+    <div id="view-projects" class="tab-content hidden space-y-4">
+      <h2 class="text-base font-semibold text-zinc-50">Portfolio Projects</h2>
+      <div class="card rounded-xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-zinc-300">
+          <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+            <tr><th class="p-3 font-medium">Actions</th><th class="p-3 font-medium">Project Name</th><th class="p-3 font-medium">Priority</th><th class="p-3 font-medium">Status</th><th class="p-3 font-medium">Target Date</th><th class="p-3 font-medium">Tech Stack</th><th class="p-3 font-medium">Key Features</th><th class="p-3 font-medium">GitHub Link</th><th class="p-3 font-medium">Live Link</th><th class="p-3 font-medium">Notes</th></tr>
+          </thead>
+          <tbody id="projects-tbody" class="divide-y divide-zinc-900"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MACHINE CODING TAB -->
+    <div id="view-mc" class="tab-content hidden space-y-4">
+      <h2 class="text-base font-semibold text-zinc-50">Machine Coding</h2>
+      <div class="card rounded-xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-zinc-300">
+          <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+            <tr><th class="p-3 font-medium">Actions</th><th class="p-3 font-medium">Date</th><th class="p-3 font-medium">Problem</th><th class="p-3 font-medium">Lang/Framework</th><th class="p-3 font-medium">Time Limit</th><th class="p-3 font-medium">Time Taken</th><th class="p-3 font-medium">Difficulty</th><th class="p-3 font-medium">Status</th><th class="p-3 font-medium">Key Learnings</th><th class="p-3 font-medium">Link/Repo</th></tr>
+          </thead>
+          <tbody id="mc-tbody" class="divide-y divide-zinc-900"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INTERVIEWS TAB -->
+    <div id="view-interviews" class="tab-content hidden space-y-4">
+      <h2 class="text-base font-semibold text-zinc-50">Interviews & Applications</h2>
+      <div class="card rounded-xl p-4 overflow-x-auto">
+        <table class="w-full text-left text-sm text-zinc-300">
+          <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+            <tr><th class="p-3 font-medium">Actions</th><th class="p-3 font-medium">Days Ago</th><th class="p-3 font-medium">Date Applied</th><th class="p-3 font-medium">Company</th><th class="p-3 font-medium">Role</th><th class="p-3 font-medium">Source</th><th class="p-3 font-medium">Status</th><th class="p-3 font-medium">Next Step</th><th class="p-3 font-medium">Follow-up Date</th><th class="p-3 font-medium">Round</th><th class="p-3 font-medium">Contact/Referral</th><th class="p-3 font-medium">Notes</th></tr>
+          </thead>
+          <tbody id="interviews-tbody" class="divide-y divide-zinc-900"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ADD / EDIT MODAL -->
+  <div id="addModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-[#0a0a0a] border border-zinc-800 rounded-xl max-w-2xl w-full p-6 shadow-2xl relative my-8">
+      <div class="flex justify-between items-center border-b border-zinc-900 pb-3 mb-4">
+        <h3 id="modalTitle" class="text-base font-semibold text-zinc-50 flex items-center gap-2">
+          <i data-lucide="edit" class="w-4 h-4 text-zinc-500"></i> Add / Edit Entry
+        </h3>
+        <button onclick="closeModal()" class="text-zinc-500 hover:text-zinc-200 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <form id="entryForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-zinc-400 mb-1">Select Track</label>
+          <select id="modalCategory" onchange="generateModalFields()" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500">
+            <option value="DSALog">DSA Problem Log</option>
+            <option value="DSATopics">DSA Topics</option>
+            <option value="Crio">Crio Course</option>
+            <option value="JS">JavaScript</option>
+            <option value="React">React</option>
+            <option value="Gym">Gym</option>
+            <option value="Projects">Projects</option>
+            <option value="MC">Machine Coding</option>
+            <option value="Interviews">Interviews</option>
+          </select>
+        </div>
+
+        <div id="dynamicFields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4 border-t border-zinc-900">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-zinc-400 hover:bg-zinc-900">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg text-xs font-medium bg-zinc-100 text-black hover:bg-white">Save Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ---------------------------------------------------------------------
+    // DATA STORES
+    // Data persists automatically via browser localStorage.
+    // Empty on first load until you add your own entries.
+    // ---------------------------------------------------------------------
+    const STORAGE_KEY = 'prep-command-center-data';
+
+    function emptyDb() {
+      return {
+        DSATopics: [],
+        DSALog: [],
+        Crio: [],
+        JS: [],
+        React: [],
+        Gym: [],
+        Projects: [],
+        MC: [],
+        Interviews: [],
+        TimeAlloc: [
+          { Area: "DSA", Target: "" },
+          { Area: "Frontend (JS/React)", Target: "" },
+          { Area: "Projects & Machine Coding", Target: "" },
+          { Area: "Job Applications", Target: "" }
+        ]
+      };
+    }
+
+    let db = emptyDb();
+    let editingIndex = null;
+    let momentumChartInstance = null;
+
+    // Keep track of open accordions state across re-renders
+    const openAccordions = {};
+
+    // ---------------------------------------------------------------------
+    // PERSISTENCE (Browser localStorage Implementation)
+    // ---------------------------------------------------------------------
+    function saveDb() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        setStorageIndicator(true, 'Saved');
+      } catch (err) {
+        console.error('Storage save error:', err);
+        setStorageIndicator(false, 'Save failed');
+      }
+    }
+
+    function loadDb() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) {
+          const parsed = JSON.parse(data);
+          db = Object.assign(emptyDb(), parsed);
+        }
+        setStorageIndicator(true, 'Synced');
+      } catch (err) {
+        console.error('Storage load error:', err);
+        setStorageIndicator(false, 'Local session only');
+      }
+    }
+
+    function setStorageIndicator(ok, label) {
+      const el = document.getElementById('storage-indicator');
+      if (!el) return;
+      el.innerHTML = `<span class="dot" style="background:${ok ? '#4ade80' : '#525252'}"></span>${label}`;
+    }
+
+    // ---------------------------------------------------------------------
+    // APP INITIALIZATION & TABS
+    // ---------------------------------------------------------------------
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('border-zinc-50', 'text-zinc-50', 'active');
+        el.classList.add('border-transparent', 'text-zinc-500');
+      });
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-zinc-500');
+        activeBtn.classList.add('border-zinc-50', 'text-zinc-50', 'active');
+      }
+      renderAll();
+    }
+
+    function renderAll() {
+      renderOverview();
+      renderDSATopics();
+      renderDSALogAccordion();
+      renderTable('Crio', 'crio-tbody');
+      renderTable('JS', 'js-tbody');
+      renderTable('React', 'react-tbody');
+      renderTable('Gym', 'gym-tbody');
+      renderTable('Projects', 'projects-tbody');
+      renderTable('MC', 'mc-tbody');
+      renderTable('Interviews', 'interviews-tbody');
+      renderTimeAlloc();
+      renderFunnel();
+      renderMomentumChart();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ---------------------------------------------------------------------
+    // OVERVIEW & STATS COMPUTATIONS
+    // ---------------------------------------------------------------------
+    function renderOverview() {
+      const dsaSolved = db.DSALog.filter(r => r.Status === 'Done').length;
+      const dsaTarget = db.DSATopics.reduce((acc, curr) => acc + (parseInt(curr['Target #']) || 0), 0);
+      document.getElementById('stat-dsa').innerText = `${dsaSolved} / ${dsaTarget || '-'}`;
+
+      const jsDone = db.JS.filter(r => r.Status === 'Done').length;
+      document.getElementById('stat-js').innerText = `${jsDone} / ${db.JS.length}`;
+
+      const reactDone = db.React.filter(r => r.Status === 'Done').length;
+      document.getElementById('stat-react').innerText = `${reactDone} / ${db.React.length}`;
+
+      const projDone = db.Projects.filter(r => r.Status === 'Completed' || r.Status === 'Done').length;
+      document.getElementById('stat-projects').innerText = `${projDone} / ${db.Projects.length}`;
+
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const gymCount = db.Gym.filter(r => r.Date && new Date(r.Date) >= sevenDaysAgo).length;
+      document.getElementById('stat-gym').innerText = gymCount;
+
+      const mcDone = db.MC.filter(r => r.Status === 'Done' || r.Status === 'Completed').length;
+      document.getElementById('stat-mc').innerText = `${mcDone} / ${db.MC.length}`;
+
+      document.getElementById('stat-apps').innerText = db.Interviews.length;
+      const offersCount = db.Interviews.filter(r => (r.Status || '').toLowerCase().includes('offer')).length;
+      document.getElementById('stat-offers').innerText = offersCount;
+
+      const tbody = document.getElementById('overview-tbody');
+      tbody.innerHTML = '';
+
+      const tracks = [
+        { name: 'DSA Problem Solving', done: dsaSolved, total: dsaTarget || db.DSALog.length, notes: 'Core practice' },
+        { name: 'JavaScript Mastery', done: jsDone, total: db.JS.length, notes: 'Language depth' },
+        { name: 'React Development', done: reactDone, total: db.React.length, notes: 'Ecosystem & hooks' },
+        { name: 'Portfolio Projects', done: projDone, total: db.Projects.length, notes: 'Showcase apps' },
+        { name: 'Crio Course Milestones', done: db.Crio.filter(r => r.Status === 'Done').length, total: db.Crio.length, notes: 'Guided milestones' },
+        { name: 'Machine Coding', done: mcDone, total: db.MC.length || 1, notes: 'LLD & UI rounds' }
+      ];
+
+      if (tracks.every(t => t.done === 0 && (t.total === 0 || t.total === 1))) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-zinc-600 text-sm">No entries yet — add your first one to see progress here.</td></tr>`;
+        return;
+      }
+
+      tracks.forEach(t => {
+        const pct = t.total > 0 ? Math.round((t.done / t.total) * 100) : 0;
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-3 font-medium text-zinc-100">${t.name}</td>
+            <td class="p-3 text-zinc-50 font-semibold">${t.done}</td>
+            <td class="p-3 text-zinc-400">${t.total}</td>
+            <td class="p-3">
+              <div class="flex items-center gap-2">
+                <div class="w-24 bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-zinc-100 h-full rounded-full" style="width: ${Math.min(pct, 100)}%"></div>
+                </div>
+                <span class="text-xs font-medium text-zinc-400">${pct}%</span>
+              </div>
+            </td>
+            <td class="p-3 text-zinc-600 text-xs">${t.notes}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // ---------------------------------------------------------------------
+    // TIME ALLOCATION & FUNNEL
+    // ---------------------------------------------------------------------
+    function renderTimeAlloc() {
+      const tbody = document.getElementById('timealloc-tbody');
+      tbody.innerHTML = '';
+      db.TimeAlloc.forEach((item, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-2.5 font-medium text-zinc-200">${item.Area}</td>
+            <td class="p-2.5 text-zinc-400 cursor-pointer hover:text-zinc-100 hover:underline" onclick="editTimeAlloc(${idx})">${item.Target || 'Set target'}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function editTimeAlloc(idx) {
+      const val = prompt("Enter new target (e.g. 15 hrs/wk):", db.TimeAlloc[idx].Target);
+      if (val !== null) {
+        db.TimeAlloc[idx].Target = val;
+        renderTimeAlloc();
+        saveDb();
+      }
+    }
+
+    function renderFunnel() {
+      const container = document.getElementById('funnel-container');
+      container.innerHTML = '';
+
+      const statuses = ['Applied', 'OA / Assessment', 'Interviewing', 'Offer', 'Rejected'];
+      const counts = {};
+      statuses.forEach(s => counts[s] = 0);
+
+      db.Interviews.forEach(item => {
+        let st = item.Status || 'Applied';
+        if (counts[st] !== undefined) counts[st]++;
+        else counts['Applied']++;
+      });
+
+      const totalApps = db.Interviews.length || 1;
+      statuses.forEach(st => {
+        const c = counts[st];
+        const pct = Math.round((c / totalApps) * 100);
+        container.innerHTML += `
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="font-medium text-zinc-400">${st}</span>
+              <span class="text-zinc-200 font-semibold">${c} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-zinc-100 h-full rounded-full" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // ---------------------------------------------------------------------
+    // MOMENTUM CHART
+    // ---------------------------------------------------------------------
+    function renderMomentumChart() {
+      const ctx = document.getElementById('momentumChart');
+      if (!ctx) return;
+
+      const weeks = [];
+      const dataCounts = [];
+      const now = new Date();
+
+      for (let i = 7; i >= 0; i--) {
+        const startOfWeek = new Date(now.getTime() - (i * 7 + now.getDay()) * 24 * 60 * 60 * 1000);
+        const endOfWeek = new Date(startOfWeek.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+        const label = `${startOfWeek.getMonth() + 1}/${startOfWeek.getDate()}`;
+        weeks.push(label);
+
+        const count = db.DSALog.filter(r => {
+          if (r.Status !== 'Done' || !r.Date) return false;
+          const d = new Date(r.Date);
+          return d >= startOfWeek && d < endOfWeek;
+        }).length;
+
+        dataCounts.push(count);
+      }
+
+      if (momentumChartInstance) {
+        momentumChartInstance.destroy();
+      }
+
+      momentumChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: weeks,
+          datasets: [{
+            label: 'Problems Solved',
+            data: dataCounts,
+            backgroundColor: 'rgba(250, 250, 250, 0.85)',
+            borderColor: 'rgba(250, 250, 250, 1)',
+            borderWidth: 0,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.04)' }, ticks: { color: '#71717a' } },
+            x: { grid: { display: false }, ticks: { color: '#71717a' } }
+          }
+        }
+      });
+    }
+
+    // ---------------------------------------------------------------------
+    // DSA RENDERERS (Topics & Accordion Log)
+    // ---------------------------------------------------------------------
+    function renderDSATopics() {
+      const tbody = document.getElementById('dsa-topics-tbody');
+      tbody.innerHTML = '';
+
+      if (db.DSATopics.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-zinc-600 text-sm">No topics yet — click "Add Topic" to start tracking.</td></tr>`;
+        return;
+      }
+
+      db.DSATopics.forEach((topicObj, index) => {
+        const topicName = topicObj.Topic;
+        const target = parseInt(topicObj['Target #']) || 0;
+        const solved = db.DSALog.filter(r => r.Topic === topicName && r.Status === 'Done').length;
+        const remaining = Math.max(0, target - solved);
+        const pct = target > 0 ? Math.round((solved / target) * 100) : 0;
+
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-3">
+              <button onclick="editEntry('DSATopics', ${index})" class="text-zinc-500 hover:text-zinc-200 mr-2" title="Edit"><i data-lucide="edit-3" class="w-3.5 h-3.5 inline"></i></button>
+              <button onclick="deleteEntry('DSATopics', ${index})" class="text-zinc-600 hover:text-red-400" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
+            </td>
+            <td class="p-3 font-medium text-zinc-100">${topicName}</td>
+            <td class="p-3 text-zinc-400">${target}</td>
+            <td class="p-3 text-zinc-50 font-semibold">${solved}</td>
+            <td class="p-3 text-zinc-400">${remaining}</td>
+            <td class="p-3">
+              <div class="flex items-center gap-2">
+                <div class="w-20 bg-zinc-900 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-zinc-100 h-full rounded-full" style="width: ${Math.min(pct, 100)}%"></div>
+                </div>
+                <span class="text-xs font-medium text-zinc-400">${pct}%</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function toggleAccordion(topicKey) {
+      openAccordions[topicKey] = !openAccordions[topicKey];
+      renderDSALogAccordion();
+    }
+
+    function renderDSALogAccordion() {
+      const container = document.getElementById('dsa-accordion-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (db.DSALog.length === 0) {
+        container.innerHTML = `<div class="card p-6 rounded-xl text-center text-zinc-600 text-sm">No problems logged yet.</div>`;
+        return;
+      }
+
+      // Collect all unique topics from DSATopics list, plus any additional topics found in DSALog
+      const topicSet = new Set();
+      db.DSATopics.forEach(t => { if(t.Topic) topicSet.add(t.Topic); });
+      db.DSALog.forEach(l => { if(l.Topic) topicSet.add(l.Topic); });
+      const topics = Array.from(topicSet);
+
+      if (topics.length === 0) {
+        // Fallback if no topic name specified anywhere
+        topics.push('General / Uncategorized');
+      }
+
+      const diffColor = { Hard: '#f87171', Medium: '#fbbf24', Easy: '#4ade80' };
+
+      topics.forEach(topic => {
+        const matchingLogs = db.DSALog.map((item, originalIndex) => ({ item, originalIndex }))
+                                      .filter(({ item }) => (item.Topic || 'General / Uncategorized') === topic);
+        
+        const solvedCount = matchingLogs.filter(({ item }) => item.Status === 'Done').length;
+        const totalCount = matchingLogs.length;
+        const isOpen = !!openAccordions[topic];
+
+        let rowsHtml = '';
+        if (matchingLogs.length === 0) {
+          rowsHtml = `<tr><td colspan="7" class="p-4 text-center text-zinc-600 text-xs">No problems logged for this topic yet.</td></tr>`;
+        } else {
+          matchingLogs.forEach(({ item, originalIndex }) => {
+            rowsHtml += `
+              <tr>
+                <td class="p-3">
+                  <button onclick="editEntry('DSALog', ${originalIndex})" class="text-zinc-500 hover:text-zinc-200 mr-2" title="Edit"><i data-lucide="edit-3" class="w-3.5 h-3.5 inline"></i></button>
+                  <button onclick="deleteEntry('DSALog', ${originalIndex})" class="text-zinc-600 hover:text-red-400" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
+                </td>
+                <td class="p-3 text-zinc-500">${item.Date || ''}</td>
+                <td class="p-3 font-medium text-zinc-100">${item.Topic || ''}</td>
+                <td class="p-3 text-zinc-300">${item['Problem Name'] || ''}</td>
+                <td class="p-3 text-zinc-400">${item.Platform || ''}</td>
+                <td class="p-3"><span class="dot" style="background:${diffColor[item.Difficulty] || '#71717a'}"></span>${item.Difficulty || ''}</td>
+                <td class="p-3"><span class="dot" style="background:${item.Status === 'Done' ? '#4ade80' : '#525252'}"></span>${item.Status || ''}</td>
+              </tr>
+            `;
+          });
+        }
+
+        container.innerHTML += `
+          <div class="card rounded-xl overflow-hidden transition-colors">
+            <button onclick="toggleAccordion('${topic.replace(/'/g, "\\'")}')" class="w-full p-4 flex items-center justify-between text-left hover:bg-zinc-950/50 transition-colors">
+              <div class="flex items-center gap-3">
+                <i data-lucide="${isOpen ? 'chevron-down' : 'chevron-right'}" class="w-4 h-4 text-zinc-400"></i>
+                <span class="font-semibold text-sm text-zinc-100">${topic}</span>
+                <span class="text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full">${solvedCount} / ${totalCount} Solved</span>
+              </div>
+              <span class="text-xs text-zinc-500">${isOpen ? 'Collapse' : 'Expand'}</span>
+            </button>
+            <div class="${isOpen ? '' : 'hidden'} border-t border-zinc-900 overflow-x-auto bg-black/40">
+              <table class="w-full text-left text-sm text-zinc-300">
+                <thead class="text-zinc-600 uppercase text-[10px] border-b border-zinc-900">
+                  <tr><th class="p-3 font-medium">Actions</th><th class="p-3 font-medium">Date</th><th class="p-3 font-medium">Topic</th><th class="p-3 font-medium">Problem Name</th><th class="p-3 font-medium">Platform</th><th class="p-3 font-medium">Difficulty</th><th class="p-3 font-medium">Status</th></tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-900">
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ---------------------------------------------------------------------
+    // GENERIC TABLE RENDERER
+    // ---------------------------------------------------------------------
+    function renderTable(category, tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let items = db[category] || [];
+
+      const searchInputId = category.toLowerCase() + '-search';
+      const filterInputId = category.toLowerCase() + '-filter';
+      const searchEl = document.getElementById(searchInputId);
+      const filterEl = document.getElementById(filterInputId);
+
+      const searchTerm = searchEl ? searchEl.value.toLowerCase() : '';
+      const filterTerm = filterEl ? filterEl.value : '';
+
+      let visibleCount = 0;
+      const colCount = items.length > 0 ? Object.keys(items[0]).length + (category === 'Interviews' ? 2 : 1) : 6;
+
+      items.forEach((item, index) => {
+        if (searchTerm || filterTerm) {
+          const textMatch = Object.values(item).some(val => String(val).toLowerCase().includes(searchTerm));
+          const statusMatch = !filterTerm || item.Status === filterTerm;
+          if (!textMatch || !statusMatch) return;
+        }
+        visibleCount++;
+
+        let trHtml = `
+          <td class="p-3">
+            <button onclick="editEntry('${category}', ${index})" class="text-zinc-500 hover:text-zinc-200 mr-2" title="Edit"><i data-lucide="edit-3" class="w-3.5 h-3.5 inline"></i></button>
+            <button onclick="deleteEntry('${category}', ${index})" class="text-zinc-600 hover:text-red-400" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
+          </td>
+        `;
+
+        if (category === 'Interviews') {
+          let daysAgo = '-';
+          if (item['Date Applied']) {
+            const diff = Math.floor((new Date() - new Date(item['Date Applied'])) / (1000 * 60 * 60 * 24));
+            daysAgo = diff >= 0 ? `${diff}d ago` : '-';
+          }
+          trHtml += `<td class="p-3 text-zinc-500">${daysAgo}</td>`;
+        }
+
+        Object.keys(item).forEach(key => {
+          let val = item[key] || '';
+          if (key === 'Status') {
+            const dotColor = (val === 'Done' || val === 'Completed' || val === 'Offer') ? '#4ade80' : val === 'In Progress' ? '#fbbf24' : '#525252';
+            val = `<span class="dot" style="background:${dotColor}"></span>${val}`;
+          } else if (key === 'Priority') {
+            const colorClass = val === 'High' ? 'text-red-400 font-medium' : val === 'Medium' ? 'text-amber-400' : 'text-zinc-500';
+            val = `<span class="${colorClass}">${val}</span>`;
+          } else if (key.includes('Link') && val) {
+            val = `<a href="${val}" target="_blank" class="text-zinc-300 hover:text-zinc-50 hover:underline flex items-center gap-1"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Open</a>`;
+          }
+          trHtml += `<td class="p-3">${val}</td>`;
+        });
+
+        tbody.innerHTML += `<tr>${trHtml}</tr>`;
+      });
+
+      if (visibleCount === 0) {
+        const msg = items.length === 0 ? 'No entries yet.' : 'No entries match your search.';
+        tbody.innerHTML = `<tr><td colspan="${colCount}" class="p-6 text-center text-zinc-600 text-sm">${msg}</td></tr>`;
+      }
+    }
+
+    // ---------------------------------------------------------------------
+    // MODAL & FORM HANDLING (ADD / EDIT)
+    // ---------------------------------------------------------------------
+    function openModal(category = 'DSALog', index = null) {
+      editingIndex = index;
+      document.getElementById('modalCategory').value = category;
+      generateModalFields(index);
+      document.getElementById('addModal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeModal() {
+      document.getElementById('addModal').classList.add('hidden');
+      editingIndex = null;
+    }
+
+    function blankTemplate(category) {
+      const today = new Date().toISOString().split('T')[0];
+      switch (category) {
+        case 'DSATopics': return { Topic: '', "Target #": '' };
+        case 'DSALog': return { Date: today, Topic: '', "Problem Name": '', Platform: '', Difficulty: 'Medium', Status: 'Done' };
+        case 'Crio': return { Date: today, Module: '', "Task / Milestone": '', Status: 'Done', "Date Completed": '', "Hours Spent": '', Notes: '' };
+        case 'JS':
+        case 'React': return { Date: today, Topic: '', Subtopic: '', Priority: 'Medium', Status: 'Not Started', "Date Revision": '', Resource: '', Notes: '' };
+        case 'Gym': return { Date: today, "Workout Type": '', "Exercises / Sets x Reps": '', "Duration (min)": '', "Weight (kg)": '', "Cardio (min)": '', Streak: '', Notes: '' };
+        case 'Projects': return { "Project Name": '', Priority: 'Medium', Status: 'In Progress', "Target Date": today, "Tech Stack": '', "Key Features": '', "GitHub Link": '', "Live Link": '', Notes: '' };
+        case 'MC': return { Date: today, Problem: '', "Lang/Framework": '', "Time Limit": '', "Time Taken": '', Difficulty: 'Medium', Status: 'Done', "Key Learnings": '', "Link/Repo": '' };
+        case 'Interviews': return { "Date Applied": today, Company: '', Role: '', Source: '', Status: 'Applied', "Next Step": '', "Follow-up Date": today, Round: '', "Contact/Referral": '', Notes: '' };
+        default: return {};
+      }
+    }
+
+    function generateModalFields(overrideIndex = null) {
+      const category = document.getElementById('modalCategory').value;
+      const container = document.getElementById('dynamicFields');
+      container.innerHTML = '';
+
+      let sampleItem = {};
+      if (overrideIndex !== null && db[category] && db[category][overrideIndex]) {
+        sampleItem = db[category][overrideIndex];
+      } else {
+        sampleItem = blankTemplate(category);
+      }
+
+      Object.keys(sampleItem).forEach(key => {
+        const val = sampleItem[key] || '';
+        const isDateKey = key.toLowerCase().includes('date');
+
+        if (category === 'DSALog' && key === 'Topic') {
+          // Render a select dropdown containing existing DSA topics if available
+          let topicOptions = `<option value="">Select Topic...</option>`;
+          db.DSATopics.forEach(t => {
+            if (t.Topic) {
+              const selected = (t.Topic === val) ? 'selected' : '';
+              topicOptions += `<option value="${t.Topic}" ${selected}>${t.Topic}</option>`;
+            }
+          });
+          container.innerHTML += `
+            <div>
+              <label class="block text-xs font-medium text-zinc-500 mb-1">${key}</label>
+              <select name="${key}" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500">
+                ${topicOptions}
+              </select>
+            </div>
+          `;
+        } else if (isDateKey) {
+          container.innerHTML += `
+            <div>
+              <label class="block text-xs font-medium text-zinc-500 mb-1">${key}</label>
+              <input type="date" name="${key}" value="${val}" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500">
+            </div>
+          `;
+        } else {
+          container.innerHTML += `
+            <div>
+              <label class="block text-xs font-medium text-zinc-500 mb-1">${key}</label>
+              <input type="text" name="${key}" value="${val}" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500">
+            </div>
+          `;
+        }
+      });
+    }
+
+    function editEntry(category, index) {
+      document.getElementById('modalCategory').value = category;
+      openModal(category, index);
+    }
+
+    function deleteEntry(category, index) {
+      if (confirm("Are you sure you want to delete this entry?")) {
+        db[category].splice(index, 1);
+        renderAll();
+        saveDb();
+      }
+    }
+
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      const category = document.getElementById('modalCategory').value;
+      const form = document.getElementById('entryForm');
+      const inputs = form.querySelectorAll('input, select');
+
+      let newItem = {};
+      inputs.forEach(input => {
+        if (input.name) {
+          newItem[input.name] = input.value;
+        }
+      });
+
+      if (!db[category]) db[category] = [];
+
+      if (editingIndex !== null) {
+        db[category][editingIndex] = newItem;
+      } else {
+        db[category].push(newItem);
+        // If it's a DSA log entry, automatically make sure the accordion for that topic stays open
+        if (category === 'DSALog' && newItem.Topic) {
+          openAccordions[newItem.Topic] = true;
+        }
+      }
+
+      closeModal();
+      renderAll();
+      saveDb();
+    }
+
+    // ---------------------------------------------------------------------
+    // EXPORT & IMPORT DATA (manual backup, in addition to auto-save)
+    // ---------------------------------------------------------------------
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `prep_command_center_backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const fileReader = new FileReader();
+      if (event.target.files[0]) {
+        fileReader.readAsText(event.target.files[0], "UTF-8");
+        fileReader.onload = (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            if (parsed && typeof parsed === 'object') {
+              db = Object.assign(emptyDb(), parsed);
+              renderAll();
+              saveDb();
+              alert("Data imported successfully!");
+            }
+          } catch (err) {
+            alert("Invalid JSON file format.");
+          }
+        };
+      }
+    }
+
+    // ---------------------------------------------------------------------
+    // Initial load
+    // ---------------------------------------------------------------------
+    window.onload = () => {
+      loadDb();
+      renderAll();
+    };
+  </script>
+</body>
+</html>
