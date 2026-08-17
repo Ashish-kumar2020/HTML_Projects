@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Routine Tracker</title>
+<style>
+  :root{
+    --bg: #0f1210;
+    --panel: #171b18;
+    --panel-2: #1e2320;
+    --border: #2b312d;
+    --text: #eef0ec;
+    --text-dim: #9aa39b;
+    --text-faint: #636b64;
+    --accent: #5dcaa5;
+    --accent-dim: #1d9e75;
+    --accent-text: #04342c;
+    --amber: #ef9f27;
+    --red: #e24b4a;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:32px 20px 80px;}
+  header{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px; flex-wrap:wrap; gap:8px;}
+  h1{font-size:20px; font-weight:600; margin:0; letter-spacing:-0.01em;}
+  .sub{color:var(--text-dim); font-size:13px; margin:0 0 24px;}
+
+  nav{display:flex; gap:4px; margin-bottom:24px; border-bottom:1px solid var(--border);}
+  nav button{
+    background:none; border:none; color:var(--text-dim); font-size:14px; font-weight:500;
+    padding:10px 4px; margin-right:20px; cursor:pointer; border-bottom:2px solid transparent;
+  }
+  nav button.active{color:var(--text); border-bottom-color:var(--accent);}
+
+  .weekbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; gap:10px; flex-wrap:wrap;}
+  .weeknav{display:flex; align-items:center; gap:10px;}
+  .weeklabel{font-size:14px; color:var(--text-dim); min-width:150px; text-align:center;}
+  .actions{display:flex; gap:8px;}
+
+  button.btn{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    padding:7px 13px; border-radius:8px; font-size:13px; cursor:pointer; font-weight:500;
+  }
+  button.btn:hover{border-color:#3a423c;}
+  button.icon-btn{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    width:30px; height:30px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  button.btn.primary{background:var(--accent-dim); border-color:var(--accent-dim); color:#eafff5;}
+  button.btn.primary:hover{background:#188a68;}
+  button.btn.small{padding:3px 10px; font-size:12px;}
+
+  .day-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px 18px; margin-bottom:12px;
+  }
+  .day-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .day-head .left{display:flex; align-items:baseline; gap:8px;}
+  .day-name{font-weight:600; font-size:15px;}
+  .day-date{font-size:12px; color:var(--text-faint);}
+  .day-progress{font-size:12px; color:var(--text-dim);}
+  .day-progress.complete{color:var(--accent);}
+
+  .track-row{display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:12px; color:var(--text-dim);}
+  .track-row button{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--text-dim);
+    padding:3px 11px; border-radius:6px; font-size:12px; cursor:pointer;
+  }
+  .track-row button.on{background:rgba(93,202,165,0.12); border-color:var(--accent-dim); color:var(--accent);}
+
+  .task-row{display:flex; align-items:center; gap:10px; padding:6px 0; font-size:14px; cursor:pointer;}
+  .task-row input{width:16px; height:16px; accent-color:var(--accent); cursor:pointer; flex-shrink:0;}
+  .task-row .tname{color:var(--text);}
+  .task-row .ttime{color:var(--text-faint); font-size:12px; margin-left:6px;}
+  .task-row.done .tname{color:var(--text-faint); text-decoration:line-through;}
+
+  .empty-note{color:var(--text-faint); font-size:13px; text-align:center; padding:16px;}
+
+  /* dashboard */
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:10px; margin-bottom:28px;}
+  .stat-card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px;}
+  .stat-label{font-size:12px; color:var(--text-dim); margin-bottom:6px;}
+  .stat-value{font-size:24px; font-weight:600;}
+  .stat-value.accent{color:var(--accent);}
+  .stat-value.warn{color:var(--amber);}
+
+  .section-title{font-size:14px; font-weight:600; margin:28px 0 12px; color:var(--text);}
+
+  table.task-stats{width:100%; border-collapse:collapse; font-size:13px;}
+  table.task-stats th{text-align:left; color:var(--text-faint); font-weight:500; padding:6px 8px; border-bottom:1px solid var(--border); font-size:12px;}
+  table.task-stats td{padding:8px; border-bottom:1px solid var(--border);}
+  table.task-stats tr:last-child td{border-bottom:none;}
+  .bar-bg{background:var(--panel-2); border-radius:4px; height:6px; width:100%; overflow:hidden;}
+  .bar-fill{background:var(--accent); height:100%;}
+
+  .missed-list{display:flex; flex-direction:column; gap:6px;}
+  .missed-item{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--panel); border:1px solid var(--border); border-radius:8px;
+    padding:9px 14px; font-size:13px;
+  }
+  .missed-item .m-day{color:var(--text-dim);}
+  .missed-item .m-task{color:var(--red);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Routine tracker</h1>
+  </header>
+  <p class="sub">Monday to Friday interview-prep schedule</p>
+
+  <nav>
+    <button id="tabTrackerBtn" class="active">Tracker</button>
+    <button id="tabDashboardBtn">Dashboard</button>
+  </nav>
+
+  <div id="trackerView">
+    <div class="weekbar">
+      <div class="weeknav">
+        <button class="icon-btn" id="prevWeek" aria-label="Previous week">&#8592;</button>
+        <span class="weeklabel" id="weekLabel"></span>
+        <button class="icon-btn" id="nextWeek" aria-label="Next week">&#8594;</button>
+      </div>
+      <div class="actions">
+        <button class="btn" id="thisWeekBtn">This week</button>
+        <button class="btn primary" id="replicateBtn">Replicate to next week &#8594;</button>
+      </div>
+    </div>
+    <div id="days"></div>
+  </div>
+
+  <div id="dashboardView" style="display:none;">
+    <div class="stat-grid" id="statGrid"></div>
+    <div class="section-title">Completion by task</div>
+    <table class="task-stats" id="taskStatsTable"></table>
+    <div class="section-title">Missed items (last 4 weeks)</div>
+    <div class="missed-list" id="missedList"></div>
+  </div>
+</div>
+
+<script>
+const TASKS = [
+  {id:'dsa', label:'DSA', time:'9:30–12:00 PM'},
+  {id:'apply', label:'Job apply', time:'12:10–1:10 PM'},
+  {id:'polyfill', label:'Polyfill', time:'3:30–4:45 PM', track:true},
+  {id:'theory', label:'Interview theory', time:'4:50–5:50 PM', track:true},
+  {id:'sysdesign', label:'Frontend system design', time:'5:50–7:50 PM'},
+  {id:'machine', label:'Machine coding', time:'9:30–11:30 PM'},
+  {id:'crio', label:'Crio.do course', time:'11:45 PM–1:00 AM'},
+  {id:'english', label:'English speaking', time:'1:05–1:30 AM'},
+];
+const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+
+function getMonday(d){
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  date.setDate(diff);
+  date.setHours(0,0,0,0);
+  return date;
+}
+function fmtDate(d){ return d.toLocaleDateString('en-US', {month:'short', day:'numeric'}); }
+function isoDate(d){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+function taskLabel(t, track){
+  if(!t.track) return t.label;
+  return track==='react' ? t.label.replace('Polyfill','React polyfill').replace('Interview theory','React interview theory')
+                          : t.label.replace('Polyfill','JS polyfill').replace('Interview theory','JS interview theory');
+}
+
+let weekStart = getMonday(new Date());
+let cache = {};
+let storageOk = true;
+
+async function loadDay(dateStr){
+  if(cache[dateStr]) return cache[dateStr];
+  let val = {done:{}, track:'js'};
+  try{
+    const res = await window.storage.get('routine:'+dateStr, false);
+    if(res) val = JSON.parse(res.value);
+  }catch(e){ /* key not found or storage unavailable */ }
+  cache[dateStr] = val;
+  return val;
+}
+async function saveDay(dateStr, data){
+  cache[dateStr] = data;
+  try{
+    await window.storage.set('routine:'+dateStr, JSON.stringify(data), false);
+  }catch(e){ storageOk = false; }
+}
+
+async function renderTracker(){
+  const label = document.getElementById('weekLabel');
+  const end = new Date(weekStart); end.setDate(end.getDate()+4);
+  label.textContent = fmtDate(weekStart) + ' – ' + fmtDate(end);
+
+  const container = document.getElementById('days');
+  container.innerHTML = '';
+
+  for(let i=0;i<5;i++){
+    const d = new Date(weekStart); d.setDate(d.getDate()+i);
+    const dateStr = isoDate(d);
+    const data = await loadDay(dateStr);
+    const doneCount = TASKS.filter(t => data.done[t.id]).length;
+    const complete = doneCount === TASKS.length;
+
+    const card = document.createElement('div');
+    card.className = 'day-card';
+
+    const head = document.createElement('div');
+    head.className = 'day-head';
+    head.innerHTML = '<div class="left"><span class="day-name">'+DAY_NAMES[i]+'</span><span class="day-date">'+fmtDate(d)+'</span></div>'+
+      '<span class="day-progress'+(complete?' complete':'')+'">'+doneCount+'/'+TASKS.length+'</span>';
+    card.appendChild(head);
+
+    const trackRow = document.createElement('div');
+    trackRow.className = 'track-row';
+    trackRow.innerHTML = '<span>Alternate track:</span>';
+    const jsBtn = document.createElement('button');
+    jsBtn.textContent = 'JS';
+    jsBtn.className = data.track==='js' ? 'on' : '';
+    const reactBtn = document.createElement('button');
+    reactBtn.textContent = 'React';
+    reactBtn.className = data.track==='react' ? 'on' : '';
+    jsBtn.onclick = async () => { data.track='js'; await saveDay(dateStr, data); renderTracker(); };
+    reactBtn.onclick = async () => { data.track='react'; await saveDay(dateStr, data); renderTracker(); };
+    trackRow.appendChild(jsBtn);
+    trackRow.appendChild(reactBtn);
+    card.appendChild(trackRow);
+
+    TASKS.forEach(t => {
+      const row = document.createElement('label');
+      row.className = 'task-row' + (data.done[t.id] ? ' done' : '');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!data.done[t.id];
+      cb.onchange = async () => { data.done[t.id] = cb.checked; await saveDay(dateStr, data); renderTracker(); };
+      row.appendChild(cb);
+      const span = document.createElement('span');
+      span.innerHTML = '<span class="tname">'+taskLabel(t, data.track)+'</span><span class="ttime">'+t.time+'</span>';
+      row.appendChild(span);
+      card.appendChild(row);
+    });
+
+    container.appendChild(card);
+  }
+}
+
+document.getElementById('prevWeek').onclick = () => { weekStart.setDate(weekStart.getDate()-7); renderTracker(); };
+document.getElementById('nextWeek').onclick = () => { weekStart.setDate(weekStart.getDate()+7); renderTracker(); };
+document.getElementById('thisWeekBtn').onclick = () => { weekStart = getMonday(new Date()); renderTracker(); };
+
+document.getElementById('replicateBtn').onclick = async () => {
+  const nextWeekStart = new Date(weekStart); nextWeekStart.setDate(nextWeekStart.getDate()+7);
+  for(let i=0;i<5;i++){
+    const curD = new Date(weekStart); curD.setDate(curD.getDate()+i);
+    const curStr = isoDate(curD);
+    const curData = await loadDay(curStr);
+
+    const nextD = new Date(nextWeekStart); nextD.setDate(nextD.getDate()+i);
+    const nextStr = isoDate(nextD);
+    const nextData = {done:{}, track: curData.track};
+    await saveDay(nextStr, nextData);
+  }
+  weekStart = nextWeekStart;
+  renderTracker();
+};
+
+// tabs
+const tabTracker = document.getElementById('tabTrackerBtn');
+const tabDashboard = document.getElementById('tabDashboardBtn');
+const trackerView = document.getElementById('trackerView');
+const dashboardView = document.getElementById('dashboardView');
+
+tabTracker.onclick = () => {
+  tabTracker.className='active'; tabDashboard.className='';
+  trackerView.style.display='block'; dashboardView.style.display='none';
+};
+tabDashboard.onclick = async () => {
+  tabDashboard.className='active'; tabTracker.className='';
+  trackerView.style.display='none'; dashboardView.style.display='block';
+  await renderDashboard();
+};
+
+async function collectWeeksData(numWeeks){
+  const mondays = [];
+  const base = getMonday(new Date());
+  for(let w=numWeeks-1; w>=0; w--){
+    const m = new Date(base); m.setDate(m.getDate() - w*7);
+    mondays.push(m);
+  }
+  const allDays = [];
+  for(const monday of mondays){
+    for(let i=0;i<5;i++){
+      const d = new Date(monday); d.setDate(d.getDate()+i);
+      const dateStr = isoDate(d);
+      if(d > new Date()) continue;
+      const data = await loadDay(dateStr);
+      const hasAny = Object.keys(data.done).length>0 || data.track!=='js';
+      allDays.push({date:d, dateStr, dayName:DAY_NAMES[i], data, hasAny});
+    }
+  }
+  return allDays;
+}
+
+async function renderDashboard(){
+  const allDays = await collectWeeksData(4);
+  const trackedDays = allDays.filter(d => d.date <= new Date());
+
+  let totalTasks = 0, totalDone = 0;
+  const perTask = {};
+  TASKS.forEach(t => perTask[t.id] = {done:0, total:0});
+  const missed = [];
+
+  trackedDays.forEach(day => {
+    TASKS.forEach(t => {
+      totalTasks++;
+      perTask[t.id].total++;
+      if(day.data.done[t.id]){
+        totalDone++;
+        perTask[t.id].done++;
+      } else if(day.date < getMonday(new Date()) || day.date < new Date(new Date().setHours(0,0,0,0))){
+        missed.push({dateStr:day.dateStr, dayName:day.dayName, date:day.date, task:taskLabel(t, day.data.track)});
+      }
+    });
+  });
+
+  const overallPct = totalTasks ? Math.round((totalDone/totalTasks)*100) : 0;
+  const fullDays = trackedDays.filter(d => TASKS.every(t => d.data.done[t.id])).length;
+
+  const statGrid = document.getElementById('statGrid');
+  statGrid.innerHTML =
+    '<div class="stat-card"><div class="stat-label">Overall completion</div><div class="stat-value accent">'+overallPct+'%</div></div>'+
+    '<div class="stat-card"><div class="stat-label">Tasks done</div><div class="stat-value">'+totalDone+' / '+totalTasks+'</div></div>'+
+    '<div class="stat-card"><div class="stat-label">Fully completed days</div><div class="stat-value">'+fullDays+'</div></div>'+
+    '<div class="stat-card"><div class="stat-label">Missed items</div><div class="stat-value warn">'+missed.length+'</div></div>';
+
+  const table = document.getElementById('taskStatsTable');
+  let rows = '<tr><th>Task</th><th>Done</th><th style="width:40%">Rate</th></tr>';
+  TASKS.forEach(t => {
+    const p = perTask[t.id];
+    const pct = p.total ? Math.round((p.done/p.total)*100) : 0;
+    rows += '<tr><td>'+t.label+'</td><td>'+p.done+'/'+p.total+'</td><td><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%"></div></div></td></tr>';
+  });
+  table.innerHTML = rows;
+
+  const missedList = document.getElementById('missedList');
+  if(missed.length === 0){
+    missedList.innerHTML = '<div class="empty-note">Nothing missed in the last 4 weeks. Solid.</div>';
+  } else {
+    missed.sort((a,b) => b.date - a.date);
+    missedList.innerHTML = missed.slice(0,40).map(m =>
+      '<div class="missed-item"><span class="m-day">'+m.dayName+', '+fmtDate(m.date)+'</span><span class="m-task">'+m.task+'</span></div>'
+    ).join('');
+  }
+}
+
+renderTracker();
+</script>
+</body>
+</html>

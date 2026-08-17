@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Morgan | Frontend Developer Portfolio</title>
+    <!-- Tailwind CSS for rapid, modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b',
+                        accent: '#38bdf8',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom smooth scroll and animations */
+        html {
+            scroll-behavior: smooth;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-slate-100 font-sans antialiased selection:bg-accent selection:text-darkBg">
+
+    <!-- ================= HEADER ================= -->
+    <header class="fixed top-0 left-0 w-full z-50 bg-darkBg/80 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="#" class="text-2xl font-extrabold tracking-tight text-white">
+                Alex<span class="text-accent">.dev</span>
+            </a>
+            
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+                <a href="#hero" class="hover:text-accent transition-colors">Home</a>
+                <a href="#skills" class="hover:text-accent transition-colors">Skills</a>
+                <a href="#experience" class="hover:text-accent transition-colors">Experience</a>
+                <a href="#projects" class="hover:text-accent transition-colors">Projects</a>
+                <a href="#blog" class="hover:text-accent transition-colors">Blog</a>
+                <a href="#contact" class="hover:text-accent transition-colors">Contact</a>
+            </nav>
+
+            <a href="#contact" class="hidden md:inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-darkBg bg-accent rounded-lg hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/20">
+                Let's Talk
+            </a>
+
+            <!-- Mobile Menu Button (Visual Only) -->
+            <button class="md:hidden text-slate-300 hover:text-white focus:outline-none">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ================= HERO SECTION ================= -->
+    <section id="hero" class="min-h-screen flex items-center pt-20 px-6 relative overflow-hidden">
+        <!-- Background Glow Effects -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
+            <!-- Hero Content -->
+            <div class="space-y-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-accent text-xs font-semibold tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                    4.8 Years Frontend Experience
+                </div>
+                <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                    Building Immersive <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500">Web Interfaces</span>
+                </h1>
+                <p class="text-slate-400 text-lg leading-relaxed max-w-xl">
+                    Hi, I'm <strong class="text-white">Alex Morgan</strong>. A Senior Frontend Developer specializing in building high-performing, scalable, and pixel-perfect applications using React, Next.js, and modern TypeScript.
+                </p>
+                <div class="flex flex-wrap gap-4 pt-2">
+                    <a href="#projects" class="px-7 py-3.5 rounded-xl bg-accent text-darkBg font-bold hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/20 flex items-center gap-2">
+                        View Projects <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                    <a href="#contact" class="px-7 py-3.5 rounded-xl bg-slate-800 text-slate-200 font-bold hover:bg-slate-700 transition-all border border-slate-700">
+                        Contact Me
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Animation / Graphic Card -->
+            <div class="flex justify-center">
+                <div class="relative w-full max-w-md bg-cardBg border border-slate-700/80 rounded-2xl p-6 shadow-2xl animate-float">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-700/60 mb-4">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <span class="text-xs font-mono text-slate-400">developer.config.ts</span>
+                    </div>
+                    <pre class="text-xs font-mono text-slate-300 overflow-x-auto leading-relaxed">
+<span class="text-purple-400">const</span> <span class="text-yellow-300">developer</span> = {
+  <span class="text-sky-400">name</span>: <span class="text-green-300">"Alex Morgan"</span>,
+  <span class="text-sky-400">role</span>: <span class="text-green-300">"Senior Frontend Engineer"</span>,
+  <span class="text-sky-400">experience</span>: <span class="text-orange-400">4.8</span>, <span class="text-slate-500">// years</span>
+  <span class="text-sky-400">coreStack</span>: [
+    <span class="text-green-300">"React"</span>, 
+    <span class="text-green-300">"Next.js"</span>, 
+    <span class="text-green-300">"TypeScript"</span>, 
+    <span class="text-green-300">"TailwindCSS"</span>
+  ],
+  <span class="text-sky-400">status</span>: <span class="text-green-300">"Available for hire"</span>
+};
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="border-slate-800 my-12">
+
+    <!-- ================= SKILLS SECTION ================= -->
+    <section id="skills" class="py-20 px-6 max-w-7xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
+            <h2 class="text-3xl font-bold tracking-tight text-white">Technical Arsenal</h2>
+            <p class="text-slate-400">The tools, frameworks, and technologies I use to bring ideas to life.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Skill Card 1 -->
+            <div class="bg-cardBg border border-slate-800 p-6 rounded-xl hover:border-accent/50 transition-all group">
+                <div class="w-12 h-12 rounded-lg bg-sky-500/10 text-accent flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-brands fa-react"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Frontend Core</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">React.js, Next.js, TypeScript, JavaScript (ES6+), HTML5, CSS3/Sass.</p>
+            </div>
+            <!-- Skill Card 2 -->
+            <div class="bg-cardBg border border-slate-800 p-6 rounded-xl hover:border-accent/50 transition-all group">
+                <div class="w-12 h-12 rounded-lg bg-sky-500/10 text-accent flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-paintbrush"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Styling & UI</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">Tailwind CSS, Styled Components, Shadcn UI, Material UI, Bootstrap.</p>
+            </div>
+            <!-- Skill Card 3 -->
+            <div class="bg-cardBg border border-slate-800 p-6 rounded-xl hover:border-accent/50 transition-all group">
+                <div class="w-12 h-12 rounded-lg bg-sky-500/10 text-accent flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">State & Performance</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">Redux Toolkit, Zustand, React Query, Web Vitals Optimization, SEO.</p>
+            </div>
+            <!-- Skill Card 4 -->
+            <div class="bg-cardBg border border-slate-800 p-6 rounded-xl hover:border-accent/50 transition-all group">
+                <div class="w-12 h-12 rounded-lg bg-sky-500/10 text-accent flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-toolbox"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Tools & Testing</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">Git, GitHub Actions, Jest, React Testing Library, Vite, Webpack, Figma.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= EXPERIENCE SECTION ================= -->
+    <section id="experience" class="py-20 px-6 max-w-5xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
+            <h2 class="text-3xl font-bold tracking-tight text-white">Work Experience</h2>
+            <p class="text-slate-400">My professional journey across high-growth product companies.</p>
+        </div>
+
+        <div class="space-y-8 border-l-2 border-slate-800 ml-4 md:ml-32 pl-6 md:pl-10 relative">
+            <!-- Experience 1 -->
+            <div class="relative">
+                <div class="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-accent border-4 border-darkBg"></div>
+                <span class="text-xs font-mono text-accent font-semibold tracking-wider uppercase">2023 — Present (1.8 Years)</span>
+                <h3 class="text-xl font-bold text-white mt-1">Senior Frontend Engineer</h3>
+                <h4 class="text-sm font-medium text-slate-400 mb-4">Vortex Technologies • Remote</h4>
+                <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                    Leading the frontend architecture team for core SaaS products. Migrated legacy React apps to Next.js, reducing initial bundle sizes by 42% and raising Core Web Vitals to the 95th percentile. Mentored junior and mid-level developers.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">Next.js</span>
+                    <span class="px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">TypeScript</span>
+                    <span class="px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">Tailwind CSS</span>
+                </div>
+            </div>
+
+            <!-- Experience 2 -->
+            <div class="relative">
+                <div class="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-slate-600 border-4 border-darkBg"></div>
+                <span class="text-xs font-mono text-slate-400 font-semibold tracking-wider uppercase">2021 — 2023 (2 Years)</span>
+                <h3 class="text-xl font-bold text-white mt-1">Frontend Developer</h3>
+                <h4 class="text-sm font-medium text-slate-400 mb-4">PixelCraft Studio • Bangalore, India</h4>
+                <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                    Developed responsive dashboards and dynamic data visualization tools for enterprise clients using React and Redux. Collaborated tightly with UX designers to implement pixel-perfect user interface layouts.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">React.js</span>
+                    <span class="px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">Redux Toolkit</span>
+                    <span class="px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">REST APIs</span>
+                </div>
+            </div>
+
+            <!-- Experience 3 -->
+            <div class="relative">
+                <div class="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-slate-600 border-4 border-darkBg"></div>
+                <span class="text-xs font-mono text-slate-400 font-semibold tracking-wider uppercase">2021 — 2021 (10 Months)</span>
+                <h3 class="text-xl font-bold text-white mt-1">Junior Web Developer</h3>
+                <h4 class="text-sm font-medium text-slate-400 mb-4">WebCore Solutions • Internship & Full-time</h4>
+                <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                    Built and optimized mobile-first landing pages, fixed cross-browser layout bugs, and integrated backend endpoints with modern JavaScript frameworks.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">JavaScript</span>
+                    <span class="px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">HTML5/CSS3</span>
+                    <span class="px-2.5 py-1 rounded bg-slate-800 text-xs text-slate-300 font-mono">Git</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= PROJECTS SECTION ================= -->
+    <section id="projects" class="py-20 px-6 max-w-7xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
+            <h2 class="text-3xl font-bold tracking-tight text-white">Featured Projects</h2>
+            <p class="text-slate-400">A selection of recent applications built from the ground up.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Project 1 -->
+            <div class="bg-cardBg border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="h-48 bg-slate-800 flex items-center justify-center text-slate-500 font-mono text-sm relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-sky-500/10 to-indigo-500/10"></div>
+                        <span class="relative z-10 group-hover:scale-105 transition-transform">DashFlow Analytics SaaS</span>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <h3 class="text-xl font-bold text-white">DashFlow Analytics</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            A real-time financial tracking dashboard featuring dynamic charting, user permission toggles, and data export capabilities.
+                        </p>
+                    </div>
+                </div>
+                <div class="p-6 pt-0 space-y-4">
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-sky-400 font-mono">Next.js</span>
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-sky-400 font-mono">Tailwind</span>
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-sky-400 font-mono">Chart.js</span>
+                    </div>
+                    <div class="flex items-center gap-4 pt-2 border-t border-slate-800">
+                        <a href="#" class="text-sm font-semibold text-white hover:text-accent flex items-center gap-1.5"><i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> Live Demo</a>
+                        <a href="#" class="text-sm font-semibold text-slate-400 hover:text-white flex items-center gap-1.5"><i class="fa-brands fa-github"></i> Code</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="bg-cardBg border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="h-48 bg-slate-800 flex items-center justify-center text-slate-500 font-mono text-sm relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-sky-500/10 to-indigo-500/10"></div>
+                        <span class="relative z-10 group-hover:scale-105 transition-transform">ShopSphere E-Commerce</span>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <h3 class="text-xl font-bold text-white">ShopSphere Store</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            A high-performance e-commerce web app built with product filtering algorithms, instant search, and a seamless cart flow.
+                        </p>
+                    </div>
+                </div>
+                <div class="p-6 pt-0 space-y-4">
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-sky-400 font-mono">React</span>
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-sky-400 font-mono">Zustand</span>
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-sky-400 font-mono">Stripe API</span>
+                    </div>
+                    <div class="flex items-center gap-4 pt-2 border-t border-slate-800">
+                        <a href="#" class="text-sm font-semibold text-white hover:text-accent flex items-center gap-1.5"><i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> Live Demo</a>
+                        <a href="#" class="text-sm font-semibold text-slate-400 hover:text-white flex items-center gap-1.5"><i class="fa-brands fa-github"></i> Code</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="bg-cardBg border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="h-48 bg-slate-800 flex items-center justify-center text-slate-500 font-mono text-sm relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-sky-500/10 to-indigo-500/10"></div>
+                        <span class="relative z-10 group-hover:scale-105 transition-transform">DevCollab Task Board</span>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <h3 class="text-xl font-bold text-white">DevCollab Trello Clone</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            A drag-and-drop task management tool inspired by Trello, engineered with smooth micro-interactions and local caching.
+                        </p>
+                    </div>
+                </div>
+                <div class="p-6 pt-0 space-y-4">
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-sky-400 font-mono">TypeScript</span>
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-sky-400 font-mono">Tailwind</span>
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-sky-400 font-mono">HTML5 DnD</span>
+                    </div>
+                    <div class="flex items-center gap-4 pt-2 border-t border-slate-800">
+                        <a href="#" class="text-sm font-semibold text-white hover:text-accent flex items-center gap-1.5"><i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> Live Demo</a>
+                        <a href="#" class="text-sm font-semibold text-slate-400 hover:text-white flex items-center gap-1.5"><i class="fa-brands fa-github"></i> Code</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= BLOG SECTION ================= -->
+    <section id="blog" class="py-20 px-6 max-w-7xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
+            <h2 class="text-3xl font-bold tracking-tight text-white">Latest Articles</h2>
+            <p class="text-slate-400">Thoughts, technical deep dives, and lessons learned building products.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <!-- Blog Post 1 -->
+            <article class="bg-cardBg border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-xs font-mono text-slate-400">
+                        <span>Jan 15, 2026</span>
+                        <span>•</span>
+                        <span>5 min read</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white hover:text-accent transition-colors cursor-pointer">
+                        Optimizing Core Web Vitals in Next.js: A Practical Guide
+                    </h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Actionable tips and tricks to improve your Largest Contentful Paint (LCP) and Cumulative Layout Shift (CLS) on large-scale Next.js apps.
+                    </p>
+                </div>
+                <div class="pt-6">
+                    <a href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline">
+                        Read Article <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+            </article>
+
+            <!-- Blog Post 2 -->
+            <article class="bg-cardBg border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-xs font-mono text-slate-400">
+                        <span>Nov 28, 2025</span>
+                        <span>•</span>
+                        <span>4 min read</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white hover:text-accent transition-colors cursor-pointer">
+                        Why We Switched to Zustand for Global State Management
+                    </h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        A comparative breakdown of Redux Toolkit versus Zustand in real-world scenarios and why simplicity often wins out.
+                    </p>
+                </div>
+                <div class="pt-6">
+                    <a href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline">
+                        Read Article <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- ================= CONTACT FORM SECTION ================= -->
+    <section id="contact" class="py-20 px-6 max-w-3xl mx-auto">
+        <div class="text-center max-w-xl mx-auto mb-16 space-y-4">
+            <h2 class="text-3xl font-bold tracking-tight text-white">Get In Touch</h2>
+            <p class="text-slate-400">Have a project in mind or want to talk frontend architecture? Drop me a message.</p>
+        </div>
+
+        <form class="bg-cardBg border border-slate-800 p-8 rounded-2xl space-y-6 shadow-xl">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Your Name</label>
+                    <input type="text" placeholder="John Doe" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Your Email</label>
+                    <input type="email" placeholder="john@example.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Subject</label>
+                <input type="text" placeholder="Project Inquiry / Job Opportunity" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Message</label>
+                <textarea rows="5" placeholder="Hey Alex, I'd love to chat about..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-accent transition-colors"></textarea>
+            </div>
+            <button type="submit" class="w-full py-4 rounded-xl bg-accent text-darkBg font-bold hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/20">
+                Send Message
+            </button>
+        </form>
+    </section>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="bg-darkBg border-t border-slate-800 py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="text-center md:text-left">
+                <a href="#" class="text-xl font-extrabold text-white">Alex<span class="text-accent">.dev</span></a>
+                <p class="text-xs text-slate-500 mt-1">© 2026 Alex Morgan. Built with passion & precision.</p>
+            </div>
+            <div class="flex items-center space-x-6 text-xl text-slate-400">
+                <a href="#" class="hover:text-accent transition-colors"><i class="fa-brands fa-github"></i></a>
+                <a href="#" class="hover:text-accent transition-colors"><i class="fa-brands fa-linkedin-in"></i></a>
+                <a href="#" class="hover:text-accent transition-colors"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" class="hover:text-accent transition-colors"><i class="fa-brands fa-dev"></i></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
