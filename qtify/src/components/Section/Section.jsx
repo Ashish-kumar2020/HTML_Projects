@@ -14,7 +14,9 @@ function Section({ title, data = [], genres = [], type }) {
       return data;
     }
 
-    return data.filter((song) => song.genre.key === selectedGenre);
+    return data.filter(
+      (song) => song.genre?.key === selectedGenre
+    );
   }, [data, selectedGenre, type]);
 
   const handleGenreChange = (event, newValue) => {
@@ -23,23 +25,13 @@ function Section({ title, data = [], genres = [], type }) {
   };
 
   const handleNext = () => {
-    setStartIndex((prev) => {
-      if (prev >= filteredData.length - 1) {
-        return prev;
-      }
-
-      return prev + 1;
-    });
+    setStartIndex((prev) =>
+      Math.min(prev + 1, filteredData.length - 1)
+    );
   };
 
   const handlePrevious = () => {
-    setStartIndex((prev) => {
-      if (prev <= 0) {
-        return 0;
-      }
-
-      return prev - 1;
-    });
+    setStartIndex((prev) => Math.max(prev - 1, 0));
   };
 
   const handleShowAll = () => {
@@ -52,7 +44,6 @@ function Section({ title, data = [], genres = [], type }) {
 
   return (
     <section className={styles.section}>
-      {/* HEADER */}
       <div className={styles.header}>
         <h2>{title}</h2>
 
@@ -66,7 +57,6 @@ function Section({ title, data = [], genres = [], type }) {
         )}
       </div>
 
-      {/* SONG TABS */}
       {isSong && (
         <Tabs
           value={selectedGenre}
@@ -79,18 +69,18 @@ function Section({ title, data = [], genres = [], type }) {
             className={styles.tab}
           />
 
-          {genres.map((genre) => (
-            <Tab
-              key={genre.key}
-              label={genre.label}
-              value={genre.key}
-              className={styles.tab}
-            />
-          ))}
+          {Array.isArray(genres) &&
+            genres.map((genre) => (
+              <Tab
+                key={genre.key}
+                label={genre.label}
+                value={genre.key}
+                className={styles.tab}
+              />
+            ))}
         </Tabs>
       )}
 
-      {/* SHOW ALL GRID FOR ALBUMS */}
       {isAlbum && showAll ? (
         <div className={styles.grid}>
           {data.map((item) => (
@@ -102,7 +92,6 @@ function Section({ title, data = [], genres = [], type }) {
           ))}
         </div>
       ) : (
-        /* CAROUSEL */
         <div className={styles.carouselWrapper}>
           {startIndex > 0 && (
             <button

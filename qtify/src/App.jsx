@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 import "./App.css";
-
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Section from "./components/Section/Section";
@@ -31,7 +30,14 @@ function App() {
         setTopAlbums(topAlbumsResponse.data);
         setNewAlbums(newAlbumsResponse.data);
         setSongs(songsResponse.data);
-        setGenres(genresResponse.data.data);
+
+        const genresData = genresResponse.data;
+
+        setGenres(
+          Array.isArray(genresData)
+            ? genresData
+            : genresData.data || []
+        );
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
@@ -40,7 +46,11 @@ function App() {
     fetchData();
   }, []);
 
-  const searchData = [...topAlbums, ...newAlbums, ...songs];
+  const searchData = [
+    ...topAlbums,
+    ...newAlbums,
+    ...songs,
+  ];
 
   return (
     <>
