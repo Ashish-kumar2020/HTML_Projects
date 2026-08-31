@@ -1,30 +1,71 @@
 .section {
-  padding: 24px 32px;
+  padding: 20px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .header h2 {
   margin: 0;
-  font-size: 20px;
   color: white;
 }
 
 .toggleButton {
-  border: none;
   background: transparent;
-  color: var(--color-primary);
+  border: none;
+  color: #34c94b;
   font-weight: 600;
   cursor: pointer;
+}
+
+.carouselWrapper {
+  position: relative;
+}
+
+.carousel {
+  display: flex;
+  gap: 20px;
+  overflow: hidden;
+}
+
+.carouselButton {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+
+  border: none;
+  border-radius: 50%;
+
+  background-color: #34c94b;
+  color: white;
+
+  cursor: pointer;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 24px;
+  line-height: 1;
+}
+
+.leftButton {
+  left: -8px;
+}
+
+.rightButton {
+  right: -8px;
 }
 
 .grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 20px;
 }
