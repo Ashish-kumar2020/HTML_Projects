@@ -1,0 +1,29 @@
+.navbar {
+  width: 100%;
+  height: 105px;
+
+  background-color: var(--color-primary);
+
+  padding: 0 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+}
+
+.navbar > a {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.navbar > :nth-child(2) {
+  width: 805px;
+  flex-shrink: 0;
+}
+
+.navbar > :last-child {
+  flex-shrink: 0;
+}
