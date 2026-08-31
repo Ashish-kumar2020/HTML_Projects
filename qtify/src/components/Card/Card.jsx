@@ -1,10 +1,10 @@
-import { Chip } from "@mui/material";
+import { Card as MuiCard, Chip } from "@mui/material";
 import styles from "./Card.module.css";
 
 function Card({ album }) {
   return (
     <div className={styles.wrapper}>
-      <div className={styles.card}>
+      <MuiCard className={styles.card}>
         <img
           src={album.image}
           alt={album.title}
@@ -18,7 +18,7 @@ function Card({ album }) {
             className={styles.chip}
           />
         </div>
-      </div>
+      </MuiCard>
 
       <p className={styles.title}>{album.title}</p>
     </div>
