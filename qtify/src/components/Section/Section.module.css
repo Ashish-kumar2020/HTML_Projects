@@ -1,43 +1,104 @@
 .section {
   padding: 20px;
+  color: white;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   margin-bottom: 16px;
 }
 
 .header h2 {
   margin: 0;
-  color: white;
+
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .toggleButton {
-  background: transparent;
   border: none;
+  background: transparent;
+
   color: #34c94b;
+
+  font-size: 14px;
   font-weight: 600;
+
   cursor: pointer;
 }
 
-.carouselWrapper {
-  position: relative;
+/* =========================
+   TABS
+========================= */
+
+.tabs {
+  margin-bottom: 16px;
 }
 
-.carousel {
+.tab {
+  min-width: auto !important;
+
+  padding: 8px 16px !important;
+
+  color: white !important;
+
+  font-size: 14px !important;
+  font-family: "Poppins", sans-serif !important;
+
+  text-transform: none !important;
+}
+
+.tabs :global(.Mui-selected) {
+  color: white !important;
+}
+
+.tabs :global(.MuiTabs-indicator) {
+  background-color: #34c94b !important;
+  height: 3px !important;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 20px;
+}
+
+/* =========================
+   CAROUSEL
+========================= */
+
+.carouselWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.carouselViewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.carouselTrack {
   display: flex;
   gap: 20px;
-  overflow: hidden;
+
+  transition: transform 0.3s ease;
 }
 
 .carouselButton {
   position: absolute;
+
   top: 45%;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
+
+  width: 28px;
+  height: 28px;
 
   border: none;
   border-radius: 50%;
@@ -46,11 +107,12 @@
   color: white;
 
   cursor: pointer;
-  z-index: 2;
+
+  z-index: 5;
 
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 
   font-size: 24px;
   line-height: 1;
@@ -62,10 +124,4 @@
 
 .rightButton {
   right: -8px;
-}
-
-.grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
 }

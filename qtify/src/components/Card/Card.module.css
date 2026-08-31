@@ -26,14 +26,18 @@
 
 .chip {
   height: 20px !important;
-  font-size: 10px !important;
   background-color: black !important;
   color: white !important;
+  font-size: 10px !important;
 }
 
 .title {
   margin: 6px 0 0;
+  color: white;
   font-size: 14px;
   font-weight: 500;
-  color: white;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
