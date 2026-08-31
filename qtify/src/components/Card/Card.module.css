@@ -1,0 +1,39 @@
+.wrapper {
+  width: 159px;
+  flex-shrink: 0;
+}
+
+.card {
+  width: 159px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: white;
+}
+
+.image {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  display: block;
+}
+
+.bottomSection {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding-left: 6px;
+}
+
+.chip {
+  height: 20px !important;
+  font-size: 10px !important;
+  background-color: black !important;
+  color: white !important;
+}
+
+.title {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+}

@@ -1,4 +1,20 @@
+:root {
+  --color-primary: #34c94b;
+  --color-black: #121212;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-black);
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
 #root {
-  width: 100%;
   min-height: 100vh;
+  background-color: var(--color-black);
 }
