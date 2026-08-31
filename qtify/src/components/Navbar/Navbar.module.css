@@ -1,29 +1,16 @@
 .navbar {
-  width: 100%;
-  height: 105px;
-
-  background-color: var(--color-primary);
-
-  padding: 0 48px;
+  height: 74px;
+  background-color: #34c94b;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  box-sizing: border-box;
+  padding: 0 32px;
+  gap: 32px;
 }
 
 .navbar > a {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
-}
-
-.navbar > :nth-child(2) {
-  width: 805px;
-  flex-shrink: 0;
-}
-
-.navbar > :last-child {
-  flex-shrink: 0;
 }
