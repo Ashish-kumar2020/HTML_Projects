@@ -20,6 +20,7 @@ const Countries = () => {
         const result = await response.json();
         setCountries(result);
       } catch (error) {
+        console.error("Error fetching data:", error);
         setError(error.message);
       } finally {
         setLoading(false);
