@@ -17,9 +17,9 @@ const XDropdown = ({
           Select a {title}
         </option>
 
-        {list.map((val) => (
-          <option value={val} key={val}>
-            {val}
+        {list.map((value) => (
+          <option value={value} key={value}>
+            {value}
           </option>
         ))}
       </select>
