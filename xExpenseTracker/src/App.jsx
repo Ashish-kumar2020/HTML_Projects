@@ -13,16 +13,12 @@ import {
   CartesianGrid,
 } from "recharts";
 import {
-  FaPlus,
   FaEdit,
   FaTrash,
-  FaWifi,
   FaGift,
-  FaBriefcase,
   FaShoppingBag,
   FaUtensils,
   FaPlane,
-  FaFilm,
   FaBook,
   FaFileInvoiceDollar,
   FaEllipsisH,
@@ -89,10 +85,14 @@ const formatDate = (date) => {
 };
 
 function App() {
+  /* ---------------- State ---------------- */
+
   const [balance, setBalance] = useState(() => {
     const savedBalance = localStorage.getItem("walletBalance");
 
-    return savedBalance !== null ? Number(savedBalance) : INITIAL_BALANCE;
+    return savedBalance !== null
+      ? Number(savedBalance)
+      : INITIAL_BALANCE;
   });
 
   const [expenses, setExpenses] = useState(() => {
@@ -103,14 +103,15 @@ function App() {
     }
 
     try {
-      return JSON.parse(savedExpenses);
+      const parsedExpenses = JSON.parse(savedExpenses);
+
+      return Array.isArray(parsedExpenses) ? parsedExpenses : [];
     } catch {
       return [];
     }
   });
 
   const [showIncomeModal, setShowIncomeModal] = useState(false);
-
   const [showExpenseModal, setShowExpenseModal] = useState(false);
 
   const [incomeAmount, setIncomeAmount] = useState("");
@@ -163,10 +164,12 @@ function App() {
     }, {});
   }, [expenses]);
 
-  const pieData = Object.entries(categoryTotals).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  const pieData = Object.entries(categoryTotals).map(
+    ([name, value]) => ({
+      name,
+      value,
+    }),
+  );
 
   const barData = Object.entries(categoryTotals)
     .map(([category, amount]) => ({
@@ -177,7 +180,9 @@ function App() {
 
   /* ---------------- Pagination ---------------- */
 
-  const totalPages = Math.ceil(expenses.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(
+    expenses.length / ITEMS_PER_PAGE,
+  );
 
   const paginatedExpenses = expenses.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -225,7 +230,10 @@ function App() {
       newErrors.title = "Title is required";
     }
 
-    if (expenseForm.price === "" || Number(expenseForm.price) <= 0) {
+    if (
+      expenseForm.price === "" ||
+      Number(expenseForm.price) <= 0
+    ) {
       newErrors.price = "Amount is required";
     }
 
@@ -255,11 +263,12 @@ function App() {
 
     if (editingExpense) {
       const oldAmount = Number(editingExpense.price);
-
       const difference = amount - oldAmount;
 
       if (difference > balance) {
-        alert("You cannot spend more than your available wallet balance.");
+        alert(
+          "You cannot spend more than your available wallet balance.",
+        );
         return;
       }
 
@@ -286,7 +295,9 @@ function App() {
     /* Adding new expense */
 
     if (amount > balance) {
-      alert("You cannot spend more than your available wallet balance.");
+      alert(
+        "You cannot spend more than your available wallet balance.",
+      );
       return;
     }
 
@@ -360,9 +371,13 @@ function App() {
       return;
     }
 
-    setBalance((current) => current + Number(expense.price));
+    setBalance(
+      (current) => current + Number(expense.price),
+    );
 
-    setExpenses((current) => current.filter((item) => item.id !== id));
+    setExpenses((current) =>
+      current.filter((item) => item.id !== id),
+    );
 
     if (paginatedExpenses.length === 1 && currentPage > 1) {
       setCurrentPage((current) => current - 1);
@@ -396,18 +411,23 @@ function App() {
 
             <div className="overview-card wallet-card">
               <div>
-                <span className="card-title">Wallet Balance:</span>
+                <span className="card-title">
+                  Wallet Balance:
+                </span>
 
-                <span className="wallet-value">₹{balance}</span>
+                <span className="wallet-value">
+                  ₹{balance}
+                </span>
               </div>
 
               <button
                 type="button"
                 className="income-button"
-                onClick={() => setShowIncomeModal(true)}
+                onClick={() =>
+                  setShowIncomeModal(true)
+                }
               >
-                <FaPlus />
-                Add Income
+                + Add Income
               </button>
             </div>
 
@@ -415,9 +435,13 @@ function App() {
 
             <div className="overview-card expense-card">
               <div>
-                <span className="card-title">Expenses:</span>
+                <span className="card-title">
+                  Expenses:
+                </span>
 
-                <span className="expense-value">₹{totalExpenses}</span>
+                <span className="expense-value">
+                  ₹{totalExpenses}
+                </span>
               </div>
 
               <button
@@ -425,8 +449,7 @@ function App() {
                 className="add-expense-button"
                 onClick={openAddExpenseModal}
               >
-                <FaPlus />
-                Add Expense
+                + Add Expense
               </button>
             </div>
 
@@ -434,36 +457,52 @@ function App() {
 
             <div className="pie-card">
               {pieData.length > 0 ? (
-                <>
-                  <ResponsiveContainer width="100%" height={260}>
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={105}
-                        label={({ percent }) => `${Math.round(percent * 100)}%`}
-                        labelLine={false}
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell
-                            key={entry.name}
-                            fill={categoryColors[index % categoryColors.length]}
-                          />
-                        ))}
-                      </Pie>
+                <ResponsiveContainer
+                  width="100%"
+                  height={260}
+                >
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={105}
+                      label={({ percent }) =>
+                        `${Math.round(percent * 100)}%`
+                      }
+                      labelLine={false}
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell
+                          key={entry.name}
+                          fill={
+                            categoryColors[
+                              index %
+                                categoryColors.length
+                            ]
+                          }
+                        />
+                      ))}
+                    </Pie>
 
-                      <Tooltip formatter={(value) => `₹${value}`} />
+                    <Tooltip
+                      formatter={(value) => `₹${value}`}
+                    />
 
-                      <Legend verticalAlign="bottom" height={30} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </>
+                    <Legend
+                      verticalAlign="bottom"
+                      height={30}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="empty-pie">
-                  <div className="empty-pie-circle">₹</div>
+                  <div className="empty-pie-circle">
+                    ₹
+                  </div>
+
                   <p>No expenses yet</p>
                 </div>
               )}
@@ -482,52 +521,73 @@ function App() {
                 {expenses.length === 0 ? (
                   <div className="empty-transactions">
                     <p>No transactions yet.</p>
-                    <button type="button" onClick={openAddExpenseModal}>
+
+                    <button
+                      type="button"
+                      onClick={openAddExpenseModal}
+                    >
                       Add your first expense
                     </button>
                   </div>
                 ) : (
                   <>
                     <div className="transaction-list">
-                      {paginatedExpenses.map((expense) => (
-                        <div className="transaction" key={expense.id}>
-                          <div className="transaction-icon">
-                            {getCategoryIcon(expense.category)}
-                          </div>
-
-                          <div className="transaction-info">
-                            <div className="transaction-title">
-                              {expense.title}
+                      {paginatedExpenses.map(
+                        (expense) => (
+                          <div
+                            className="transaction"
+                            key={expense.id}
+                          >
+                            <div className="transaction-icon">
+                              {getCategoryIcon(
+                                expense.category,
+                              )}
                             </div>
 
-                            <div className="transaction-date">
-                              {formatDate(expense.date)}
+                            <div className="transaction-info">
+                              <div className="transaction-title">
+                                {expense.title}
+                              </div>
+
+                              <div className="transaction-date">
+                                {formatDate(
+                                  expense.date,
+                                )}
+                              </div>
                             </div>
+
+                            <div className="transaction-amount">
+                              ₹{expense.price}
+                            </div>
+
+                            <button
+                              type="button"
+                              className="delete-button"
+                              aria-label="Delete expense"
+                              onClick={() =>
+                                deleteExpense(
+                                  expense.id,
+                                )
+                              }
+                            >
+                              <FaTrash />
+                            </button>
+
+                            <button
+                              type="button"
+                              className="edit-button"
+                              aria-label="Edit expense"
+                              onClick={() =>
+                                openEditExpenseModal(
+                                  expense,
+                                )
+                              }
+                            >
+                              <FaEdit />
+                            </button>
                           </div>
-
-                          <div className="transaction-amount">
-                            ₹{expense.price}
-                          </div>
-
-                          <button
-                            type="button"
-                            className="delete-button"
-                            aria-label="Delete expense"
-                            onClick={() => deleteExpense(expense.id)}
-                          >
-                            <FaTrash />
-                          </button>
-
-                          <button
-                            type="button"
-                            className="edit-button"
-                            aria-label="Edit expense"
-                            onClick={() => openEditExpenseModal(expense)}
-                          >
-                            <FaEdit />
-                          </button>
-                        </div>
-                      ))}
+                        ),
+                      )}
                     </div>
 
                     {/* Pagination */}
@@ -538,19 +598,27 @@ function App() {
                           type="button"
                           disabled={currentPage === 1}
                           onClick={() =>
-                            setCurrentPage((current) => current - 1)
+                            setCurrentPage(
+                              (current) => current - 1,
+                            )
                           }
                         >
                           ←
                         </button>
 
-                        <span className="current-page">{currentPage}</span>
+                        <span className="current-page">
+                          {currentPage}
+                        </span>
 
                         <button
                           type="button"
-                          disabled={currentPage === totalPages}
+                          disabled={
+                            currentPage === totalPages
+                          }
                           onClick={() =>
-                            setCurrentPage((current) => current + 1)
+                            setCurrentPage(
+                              (current) => current + 1,
+                            )
                           }
                         >
                           →
@@ -569,7 +637,10 @@ function App() {
 
               <div className="top-expenses-card">
                 {barData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={350}>
+                  <ResponsiveContainer
+                    width="100%"
+                    height={350}
+                  >
                     <BarChart
                       data={barData}
                       layout="vertical"
@@ -580,9 +651,15 @@ function App() {
                         bottom: 10,
                       }}
                     >
-                      <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+                      <CartesianGrid
+                        horizontal={false}
+                        strokeDasharray="3 3"
+                      />
 
-                      <XAxis type="number" hide />
+                      <XAxis
+                        type="number"
+                        hide
+                      />
 
                       <YAxis
                         type="category"
@@ -596,12 +673,19 @@ function App() {
                         tickLine={false}
                       />
 
-                      <Tooltip formatter={(value) => `₹${value}`} />
+                      <Tooltip
+                        formatter={(value) => `₹${value}`}
+                      />
 
                       <Bar
                         dataKey="amount"
                         fill="#8984d6"
-                        radius={[0, 15, 15, 0]}
+                        radius={[
+                          0,
+                          15,
+                          15,
+                          0,
+                        ]}
                         barSize={26}
                       />
                     </BarChart>
@@ -622,11 +706,15 @@ function App() {
       {showIncomeModal && (
         <div
           className="modal-overlay"
-          onClick={() => setShowIncomeModal(false)}
+          onClick={() =>
+            setShowIncomeModal(false)
+          }
         >
           <div
             className="modal income-modal"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(event) =>
+              event.stopPropagation()
+            }
           >
             <div className="modal-heading">
               <h2>Add Balance</h2>
@@ -637,19 +725,28 @@ function App() {
                 type="number"
                 placeholder="Income Amount"
                 value={incomeAmount}
-                onChange={(event) => setIncomeAmount(event.target.value)}
+                onChange={(event) =>
+                  setIncomeAmount(
+                    event.target.value,
+                  )
+                }
                 min="1"
               />
 
               <div className="modal-actions">
-                <button type="submit" className="modal-submit">
+                <button
+                  type="submit"
+                  className="modal-submit"
+                >
                   Add Balance
                 </button>
 
                 <button
                   type="button"
                   className="modal-cancel"
-                  onClick={() => setShowIncomeModal(false)}
+                  onClick={() =>
+                    setShowIncomeModal(false)
+                  }
                 >
                   Cancel
                 </button>
@@ -662,13 +759,22 @@ function App() {
       {/* Add/Edit Expense Modal */}
 
       {showExpenseModal && (
-        <div className="modal-overlay" onClick={closeExpenseModal}>
+        <div
+          className="modal-overlay"
+          onClick={closeExpenseModal}
+        >
           <div
             className="modal expense-modal"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(event) =>
+              event.stopPropagation()
+            }
           >
             <div className="modal-heading">
-              <h2>{editingExpense ? "Edit Expense" : "Add Expense"}</h2>
+              <h2>
+                {editingExpense
+                  ? "Edit Expense"
+                  : "Add Expense"}
+              </h2>
             </div>
 
             <form onSubmit={handleExpenseSubmit}>
@@ -681,7 +787,9 @@ function App() {
               />
 
               {errors.title && (
-                <span className="form-error">{errors.title}</span>
+                <span className="form-error">
+                  {errors.title}
+                </span>
               )}
 
               <input
@@ -694,7 +802,9 @@ function App() {
               />
 
               {errors.price && (
-                <span className="form-error">{errors.price}</span>
+                <span className="form-error">
+                  {errors.price}
+                </span>
               )}
 
               <select
@@ -702,17 +812,24 @@ function App() {
                 value={expenseForm.category}
                 onChange={handleExpenseChange}
               >
-                <option value="">Select Category</option>
+                <option value="">
+                  Select Category
+                </option>
 
                 {categories.map((category) => (
-                  <option key={category} value={category}>
+                  <option
+                    key={category}
+                    value={category}
+                  >
                     {category}
                   </option>
                 ))}
               </select>
 
               {errors.category && (
-                <span className="form-error">{errors.category}</span>
+                <span className="form-error">
+                  {errors.category}
+                </span>
               )}
 
               <input
@@ -722,11 +839,20 @@ function App() {
                 onChange={handleExpenseChange}
               />
 
-              {errors.date && <span className="form-error">{errors.date}</span>}
+              {errors.date && (
+                <span className="form-error">
+                  {errors.date}
+                </span>
+              )}
 
               <div className="modal-actions">
-                <button type="submit" className="modal-submit">
-                  {editingExpense ? "Update Expense" : "Add Expense"}
+                <button
+                  type="submit"
+                  className="modal-submit"
+                >
+                  {editingExpense
+                    ? "Update Expense"
+                    : "Add Expense"}
                 </button>
 
                 <button
