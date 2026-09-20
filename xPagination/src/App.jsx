@@ -18,14 +18,15 @@ function App() {
         );
 
         if (!response.ok) {
-          throw new Error("Error while fetching the user data");
+          throw new Error("Failed to fetch data");
         }
 
         const data = await response.json();
 
         setUserData(data);
       } catch (error) {
-        alert("Error while fetching the user data");
+        alert("Failed to fetch data");
+        setUserData([]);
       } finally {
         setLoading(false);
       }
@@ -43,11 +44,11 @@ function App() {
   const currentUsers = userData.slice(startIndex, endIndex);
 
   const handlePrevious = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
   const handleNext = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
   };
 
   return (
@@ -97,11 +98,8 @@ function App() {
                   className="h-[47px] border-b border-gray-200"
                 >
                   <td className="px-4">{employee.id}</td>
-
                   <td className="px-4">{employee.name}</td>
-
                   <td className="px-4">{employee.email}</td>
-
                   <td className="px-4">{employee.role}</td>
                 </tr>
               ))}
@@ -111,7 +109,7 @@ function App() {
       </section>
 
       {/* Pagination */}
-      {!loading && (
+      {!loading && totalPages > 0 && (
         <div className="mt-12 flex items-center justify-center gap-5">
           <button
             onClick={handlePrevious}
@@ -121,9 +119,7 @@ function App() {
             Previous
           </button>
 
-          <span className="font-medium">
-            {currentPage} / {totalPages}
-          </span>
+          <span>{currentPage}</span>
 
           <button
             onClick={handleNext}
