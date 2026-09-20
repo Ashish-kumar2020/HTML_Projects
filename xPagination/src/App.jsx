@@ -1,36 +1,54 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
-import { useEffect } from "react";
 
 function App() {
   const [userData, setUserData] = useState([]);
-  const [currPage, setCurrPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const rowsPerPage = 10;
-  const startIndex = (currPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const currUserData = userData.slice(startIndex, endIndex);
-  const totalPage = Math.ceil(userData.length / rowsPerPage);
 
   useEffect(() => {
     async function fetchUserData() {
       try {
+        setLoading(true);
+
         const response = await fetch(
           "https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json",
         );
+
         if (!response.ok) {
           throw new Error("Error while fetching the user data");
         }
+
         const data = await response.json();
+
         setUserData(data);
       } catch (error) {
-        console.error(error);
+        alert("Error while fetching the user data");
+      } finally {
+        setLoading(false);
       }
     }
+
     fetchUserData();
   }, []);
-  useEffect(() => {
-    console.log(userData);
-  }, [userData]);
+
+  // Pagination
+  const totalPages = Math.ceil(userData.length / rowsPerPage);
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+
+  const currentUsers = userData.slice(startIndex, endIndex);
+
+  const handlePrevious = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNext = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
 
   return (
     <div className="min-h-screen px-7 py-10">
@@ -49,46 +67,73 @@ function App() {
             </tr>
           </thead>
 
-          <tbody>
-            {currUserData.map((employee) => (
-              <tr
-                key={employee.id}
-                className="h-[47px] border-b border-gray-200"
-              >
-                <td className="px-4">{employee.id}</td>
+          {loading ? (
+            <tbody>
+              {Array.from({ length: rowsPerPage }).map((_, index) => (
+                <tr key={index} className="h-[47px] border-b border-gray-200">
+                  <td className="px-4">
+                    <div className="h-4 w-6 animate-pulse rounded bg-gray-200" />
+                  </td>
 
-                <td className="px-4">{employee.name}</td>
+                  <td className="px-4">
+                    <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+                  </td>
 
-                <td className="px-4">{employee.email}</td>
+                  <td className="px-4">
+                    <div className="h-4 w-48 animate-pulse rounded bg-gray-200" />
+                  </td>
 
-                <td className="px-4">{employee.role}</td>
-              </tr>
-            ))}
-          </tbody>
+                  <td className="px-4">
+                    <div className="h-4 w-16 animate-pulse rounded bg-gray-200" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          ) : (
+            <tbody>
+              {currentUsers.map((employee) => (
+                <tr
+                  key={employee.id}
+                  className="h-[47px] border-b border-gray-200"
+                >
+                  <td className="px-4">{employee.id}</td>
+
+                  <td className="px-4">{employee.name}</td>
+
+                  <td className="px-4">{employee.email}</td>
+
+                  <td className="px-4">{employee.role}</td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
       </section>
 
-      <div className="mt-12 flex justify-center gap-5">
-        <button
-          className="rounded-md bg-[#009879] px-4 py-2 text-sm font-medium text-white cursor-pointer"
-          disabled={currPage === 1}
-          onClick={() => setCurrPage((prev) => prev - 1)}
-        >
-          Previous
-        </button>
+      {/* Pagination */}
+      {!loading && (
+        <div className="mt-12 flex items-center justify-center gap-5">
+          <button
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
+            className="rounded-md bg-[#009879] px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Previous
+          </button>
 
-        <button className="rounded-md bg-[#009879] px-4 py-2 text-sm font-medium text-white">
-          1
-        </button>
+          <span className="font-medium">
+            {currentPage} / {totalPages}
+          </span>
 
-        <button
-          className="rounded-md bg-[#009879] px-4 py-2 text-sm font-medium text-white cursor-pointer"
-          disabled={currPage === totalPage}
-          onClick={() => setCurrPage((prev) => prev + 1)}
-        >
-          Next
-        </button>
-      </div>
+          <button
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+            className="rounded-md bg-[#009879] px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
