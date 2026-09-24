@@ -7,7 +7,7 @@ const CountryCard = ({ country }) => {
         className="w-20 h-20"
       />
 
-      <h4 className="mt-2">{country.common}</h4>
+      <p className="mt-2">{country.common}</p>
     </div>
   );
 };
