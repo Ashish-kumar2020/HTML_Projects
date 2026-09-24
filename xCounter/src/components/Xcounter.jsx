@@ -1,31 +1,43 @@
-import { useState } from "react";
+import { Component } from "react";
 
-const XCounter = () => {
-  const [count, setCount] = useState(0);
+class XCounter extends Component {
+  constructor(props) {
+    super(props);
 
-  const handleIncrement = () => {
-    setCount((prevCount) => prevCount + 1);
+    this.state = {
+      count: 0,
+    };
+  }
+
+  handleIncrement = () => {
+    this.setState((prevState) => ({
+      count: prevState.count + 1,
+    }));
   };
 
-  const handleDecrement = () => {
-    setCount((prevCount) => prevCount - 1);
+  handleDecrement = () => {
+    this.setState((prevState) => ({
+      count: prevState.count - 1,
+    }));
   };
 
-  return (
-    <div>
-      <h1>Counter App</h1>
+  render() {
+    return (
+      <div>
+        <h1>Counter App</h1>
 
-      <p>Count: {count}</p>
+        <p>Count: {this.state.count}</p>
 
-      <button type="button" onClick={handleIncrement}>
-        Increment
-      </button>
+        <button type="button" onClick={this.handleIncrement}>
+          Increment
+        </button>
 
-      <button type="button" onClick={handleDecrement}>
-        Decrement
-      </button>
-    </div>
-  );
-};
+        <button type="button" onClick={this.handleDecrement}>
+          Decrement
+        </button>
+      </div>
+    );
+  }
+}
 
 export default XCounter;
